@@ -1,7 +1,7 @@
 #include "mainwindow.h"
 
 #include <QApplication>
-#include "drawcanvas.h"
+#include "DrawCanvas.h"
 
 int main(int argc, char *argv[])
 {

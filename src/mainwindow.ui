@@ -24,17 +24,10 @@
         </property>
        </widget>
       </item>
+      <item>
+       <widget class="QGraphicsView" name="graphicsViewMain"/>
+      </item>
      </layout>
-    </item>
-    <item>
-     <widget class="DrawCanvas" name="drawCanvasPlaceholder" native="true">
-      <property name="sizePolicy">
-       <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
-        <horstretch>0</horstretch>
-        <verstretch>0</verstretch>
-       </sizepolicy>
-      </property>
-     </widget>
     </item>
    </layout>
   </widget>
@@ -50,14 +43,6 @@
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
  </widget>
- <customwidgets>
-  <customwidget>
-   <class>DrawCanvas</class>
-   <extends>QWidget</extends>
-   <header>drawcanvas.h</header>
-   <container>1</container>
-  </customwidget>
- </customwidgets>
  <resources/>
  <connections/>
 </ui>

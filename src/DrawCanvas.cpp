@@ -1,4 +1,4 @@
-#include "drawcanvas.h"
+#include "DrawCanvas.h"
 
 DrawCanvas::DrawCanvas(QWidget *parent)
     : QWidget{parent}
