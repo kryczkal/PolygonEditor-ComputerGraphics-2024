@@ -1,30 +1,35 @@
-#ifndef POLYGONITEM_H
-#define POLYGONITEM_H
+#ifndef POLYGONEDITOR_POLYGONITEM_H
+#define POLYGONEDITOR_POLYGONITEM_H
+
+#include "EdgeItem.h"
+#include "VertexItem.h"
 #include <QGraphicsItem>
+#include <QList>
 #include <QPainter>
 
 class PolygonItem : public QGraphicsItem
 {
-public:
-    PolygonItem(const QPolygonF &polygon);
-    QRectF boundingRect() const override;
+    public:
+    PolygonItem();
 
+    QRectF boundingRect() const override;
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
 
-    void setPolygon(const QPolygonF &newPolygon);
-    QPolygonF getPolygon() const;
+    void addVertex(const QPointF &position);
 
-protected:
+    ~PolygonItem();
+
+    protected:
     void mousePressEvent(QGraphicsSceneMouseEvent *event) override;
     void mouseMoveEvent(QGraphicsSceneMouseEvent *event) override;
     void mouseReleaseEvent(QGraphicsSceneMouseEvent *event) override;
 
-private:
-    QPolygonF polygon;
-    int selectedVertexIndex;
-
-    void drawBresenhamLine(QPainter *painter, const QPointF &start, const QPointF &end);
+    private:
     int findClosestVertex(const QPointF &pos);
+
+    QList<VertexItem *> vertices;
+    QList<EdgeItem *> edges;
+    int selectedVertexIndex;
 };
 
-#endif // POLYGONITEM_H
+#endif // POLYGONEDITOR_POLYGONITEM_H

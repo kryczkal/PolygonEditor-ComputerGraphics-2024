@@ -12,19 +12,22 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Widgets)
 find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Widgets)
 
+# Copy assets to build directory
+file(COPY assets DESTINATION ${CMAKE_BINARY_DIR})
+
 # Add include directory
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
 
 # Source files in src folder
 set(PROJECT_SOURCES
     src/main.cpp
-    src/mainwindow.cpp
-        src/DrawCanvas.cpp
+        src/MainWindow.cpp
         src/PolygonItem.cpp
-    include/mainwindow.h
-        include/DrawCanvas.h
+        include/MainWindow.h
         include/PolygonItem.h
-    src/mainwindow.ui
+        include/VertexItem.h
+        src/EdgeItem.cpp
+        src/VertexItem.cpp
 )
 
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
