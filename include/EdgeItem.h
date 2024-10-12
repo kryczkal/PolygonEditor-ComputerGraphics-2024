@@ -8,6 +8,7 @@
 #include <QGraphicsItem>
 #include <QList>
 #include <QPainter>
+#include <gtest/gtest.h>
 
 #include "VertexItem.h"
 
@@ -21,13 +22,14 @@ class EdgeItem : public QGraphicsItem
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
 
     private:
-    void bresenham(QPainter *painter, const QPointF &start, const QPointF &end, qreal width);
+    static constexpr bool useBresenham = true;
 
     VertexItem *startVertex;
     VertexItem *endVertex;
     qreal width = 2.0;
 
-    static constexpr bool useBresenham = true;
+    void contextMenuEvent(QGraphicsSceneContextMenuEvent *event) override;
+    void bresenham(QPainter *painter, const QPointF &start, const QPointF &end, qreal width);
 
     friend QDataStream &operator<<(QDataStream &out, const EdgeItem &edge);
     friend class PolygonItem;

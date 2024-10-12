@@ -2,11 +2,12 @@
 // Created by wookie on 10/11/24.
 //
 
-#include "VertexItem.h"
-#include "PolygonItem.h"
 #include <QAction>
 #include <QGraphicsSceneContextMenuEvent>
 #include <QMenu>
+
+#include "PolygonItem.h"
+#include "VertexItem.h"
 
 VertexItem::VertexItem(const QPointF &position, QGraphicsItem *parent) : QGraphicsItem(parent), position{position} {}
 

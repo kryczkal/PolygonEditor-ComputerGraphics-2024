@@ -1,9 +1,13 @@
 //
 // Created by wookie on 10/11/24.
 //
+#include <QAction>
 #include <QDebug>
+#include <QGraphicsSceneContextMenuEvent>
+#include <QMenu>
 
 #include "EdgeItem.h"
+#include "PolygonItem.h"
 
 EdgeItem::EdgeItem(VertexItem *start, VertexItem *end, QGraphicsItem *parent)
     : QGraphicsItem(parent), startVertex{start}, endVertex{end}
@@ -81,4 +85,13 @@ QDataStream &operator<<(QDataStream &out, const EdgeItem &edge)
 {
     out << "(" << edge.startVertex->getPosition() << ", " << edge.endVertex->getPosition() << ")";
     return out;
+}
+void EdgeItem::contextMenuEvent(QGraphicsSceneContextMenuEvent *event)
+{
+    //    QMenu menu;
+    //    QAction *subdivideAction = menu.addAction("Subdivide");
+    //    QAction *selectedAction  = menu.exec(event->screenPos());
+    //
+    //    PolygonItem *polygon = dynamic_cast<PolygonItem *>(parentItem());
+    //    polygon->subdivideEdge(this);
 }

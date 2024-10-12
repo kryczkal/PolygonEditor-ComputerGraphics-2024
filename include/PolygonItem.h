@@ -1,11 +1,13 @@
 #ifndef POLYGONEDITOR_POLYGONITEM_H
 #define POLYGONEDITOR_POLYGONITEM_H
 
-#include "EdgeItem.h"
 #include "VertexItem.h"
 #include <QGraphicsItem>
 #include <QList>
 #include <QPainter>
+#include <gtest/gtest.h>
+
+#include "EdgeItem.h"
 
 class PolygonItem : public QGraphicsItem
 {
@@ -20,6 +22,9 @@ class PolygonItem : public QGraphicsItem
     void deleteVertex(unsigned int index);
     void deleteVertex(VertexItem *vertex);
 
+    void subdivideEdge(unsigned int index);
+    void subdivideEdge(EdgeItem *edge);
+
     ~PolygonItem();
 
     protected:
@@ -28,12 +33,19 @@ class PolygonItem : public QGraphicsItem
     void mouseReleaseEvent(QGraphicsSceneMouseEvent *event) override;
 
     private:
+    void addEdge(EdgeItem *edge, int idx = -1);
+    void removeEdge(EdgeItem *edge);
     int findClosestVertex(const QPointF &pos);
+
+    bool checkLinearOrdering();
 
     QList<VertexItem *> vertices;
     QList<EdgeItem *> edges;
     QHash<VertexItem *, QList<EdgeItem *>> vertexEdges;
     int selectedVertexIndex;
+
+    FRIEND_TEST(PolygonItemTest, CheckLinearOrdering);
+    void printOrderingStatus(VertexItem *vertex, const QString &message) const;
 };
 
 #endif // POLYGONEDITOR_POLYGONITEM_H

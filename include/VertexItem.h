@@ -8,6 +8,7 @@
 #include <QGraphicsItem>
 #include <QList>
 #include <QPainter>
+#include <gtest/gtest.h>
 
 class VertexItem : public QGraphicsItem
 {
@@ -21,11 +22,11 @@ class VertexItem : public QGraphicsItem
     void setPosition(const QPointF &newPosition);
     QPointF getPosition() const;
 
-    void contextMenuEvent(QGraphicsSceneContextMenuEvent *event) override;
-
     private:
     QPointF position;
     qreal radius = 5.0;
+
+    void contextMenuEvent(QGraphicsSceneContextMenuEvent *event) override;
 
     friend QDataStream &operator<<(QDataStream &out, const VertexItem &vertex);
     friend class PolygonItem;

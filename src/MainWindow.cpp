@@ -1,11 +1,12 @@
-#include "MainWindow.h"
-#include "PolygonItem.h"
 #include <QGraphicsView>
 #include <QIcon>
 #include <QPushButton>
 #include <QSplitter>
 #include <QToolBar>
 #include <QVBoxLayout>
+
+#include "MainWindow.h"
+#include "PolygonItem.h"
 
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
 {
