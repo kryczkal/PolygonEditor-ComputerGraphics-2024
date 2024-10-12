@@ -28,6 +28,9 @@ class EdgeItem : public QGraphicsItem
     qreal width = 2.0;
 
     static constexpr bool useBresenham = true;
+
+    friend QDataStream &operator<<(QDataStream &out, const EdgeItem &edge);
+    friend class PolygonItem;
 };
 
 #endif // POLYGONEDITOR_EDGEITEM_H

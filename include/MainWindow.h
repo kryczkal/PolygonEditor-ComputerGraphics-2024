@@ -22,7 +22,8 @@ class MainWindow : public QMainWindow
     ~MainWindow();
 
     public slots:
-    void HandleButton();
+    void DeletePolygon();
+    void AddVertex();
 
     private:
     QGraphicsScene *scene;

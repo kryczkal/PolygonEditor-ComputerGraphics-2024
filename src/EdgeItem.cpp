@@ -76,3 +76,9 @@ void EdgeItem::bresenham(QPainter *painter, const QPointF &start, const QPointF 
         }
     }
 }
+
+QDataStream &operator<<(QDataStream &out, const EdgeItem &edge)
+{
+    out << "(" << edge.startVertex->getPosition() << ", " << edge.endVertex->getPosition() << ")";
+    return out;
+}

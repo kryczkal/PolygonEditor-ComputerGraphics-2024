@@ -17,6 +17,9 @@ class PolygonItem : public QGraphicsItem
 
     void addVertex(const QPointF &position);
 
+    void deleteVertex(unsigned int index);
+    void deleteVertex(VertexItem *vertex);
+
     ~PolygonItem();
 
     protected:
@@ -29,6 +32,7 @@ class PolygonItem : public QGraphicsItem
 
     QList<VertexItem *> vertices;
     QList<EdgeItem *> edges;
+    QHash<VertexItem *, QList<EdgeItem *>> vertexEdges;
     int selectedVertexIndex;
 };
 

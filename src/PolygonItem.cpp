@@ -3,6 +3,7 @@
 #include <QGraphicsSceneMouseEvent>
 #include <QGraphicsView>
 #include <cmath>
+#include <iostream>
 
 PolygonItem::PolygonItem() : selectedVertexIndex(-1) {}
 
@@ -48,10 +49,23 @@ void PolygonItem::addVertex(const QPointF &position)
     VertexItem *newVertex = new VertexItem(position, this);
     vertices.append(newVertex);
 
+    // TODO: Wrap adding to the vertexEdges hash and edges list in a function (same with deleting)
     if (vertices.size() > 3)
     {
         // Remove the closing edge (from the last vertex to the first one)
         EdgeItem *lastEdge = edges.last();
+
+        VertexItem *firstVertex = vertices[0];
+        VertexItem *lastVertex  = vertices[vertices.size() - 2];
+
+        assert(lastEdge->startVertex == lastVertex && lastEdge->endVertex == firstVertex);
+        assert(vertexEdges.contains(firstVertex) && vertexEdges.contains(lastVertex));
+        assert(vertexEdges[firstVertex].contains(lastEdge) && vertexEdges[lastVertex].contains(lastEdge));
+        assert(vertexEdges[firstVertex].size() == 2 && vertexEdges[lastVertex].size() == 2);
+
+        vertexEdges[firstVertex].removeOne(lastEdge);
+        vertexEdges[lastVertex].removeOne(lastEdge);
+
         edges.removeLast();
         delete lastEdge;
     }
@@ -62,6 +76,10 @@ void PolygonItem::addVertex(const QPointF &position)
         VertexItem *previousVertex = vertices[vertices.size() - 2];
         EdgeItem *newEdge          = new EdgeItem(previousVertex, newVertex, this);
         edges.append(newEdge);
+
+        assert(vertexEdges[previousVertex].size() < 2 && vertexEdges[newVertex].size() < 2);
+        vertexEdges[previousVertex].append(newEdge);
+        vertexEdges[newVertex].append(newEdge);
     }
 
     if (vertices.size() > 2)
@@ -69,8 +87,14 @@ void PolygonItem::addVertex(const QPointF &position)
         // Add a closing edge (from the last vertex to the first one)
         VertexItem *firstVertex = vertices[0];
         VertexItem *lastVertex  = vertices[vertices.size() - 1];
-        EdgeItem *newEdge       = new EdgeItem(lastVertex, firstVertex, this);
+        assert(firstVertex != lastVertex);
+        EdgeItem *newEdge = new EdgeItem(lastVertex, firstVertex, this);
         edges.append(newEdge);
+
+        assert(vertexEdges.contains(firstVertex) && vertexEdges.contains(lastVertex));
+        assert(vertexEdges[firstVertex].size() == 1 && vertexEdges[lastVertex].size() == 1);
+        vertexEdges[firstVertex].append(newEdge);
+        vertexEdges[lastVertex].append(newEdge);
     }
 
     // Update boundingRect
@@ -83,8 +107,7 @@ void PolygonItem::mousePressEvent(QGraphicsSceneMouseEvent *event)
     selectedVertexIndex = findClosestVertex(clickPos);
     if (selectedVertexIndex != -1)
     {
-        setFlag(QGraphicsItem::ItemIsMovable, true);
-        //        vertices[selectedVertexIndex]->setFlag(QGraphicsItem::ItemIsMovable, true);
+        vertices[selectedVertexIndex]->setFlag(QGraphicsItem::ItemIsMovable, true);
     }
 }
 
@@ -139,5 +162,69 @@ PolygonItem::~PolygonItem()
     for (auto edge : edges)
     {
         delete edge;
+    }
+
+    vertices.clear();
+    edges.clear();
+    vertexEdges.clear();
+}
+
+void PolygonItem::deleteVertex(unsigned int index)
+{
+    if (index >= vertices.size())
+        return;
+
+    VertexItem *vertex = vertices[index];
+    QList<VertexItem *> verticesToMerge;
+
+    qDebug() << "Deleting vertex " << index;
+
+    assert(vertices.size() <= 1 || vertexEdges.contains(vertex));
+    assert(vertices.size() <= 2 || vertexEdges[vertex].size() == 2);
+
+    for (auto edge : vertexEdges[vertex])
+    {
+        qDebug() << "Deleting edge";
+        VertexItem *start = edge->startVertex;
+        VertexItem *end   = edge->endVertex;
+
+        if (start == vertex)
+            verticesToMerge.append(end);
+        else
+            verticesToMerge.append(start);
+
+        vertexEdges[start].removeOne(edge);
+        vertexEdges[end].removeOne(edge);
+        edges.removeOne(edge);
+        delete edge;
+    }
+
+    assert(vertices.size() <= 2 || verticesToMerge.size() == 2);
+
+    if (vertices.size() > 2 && verticesToMerge.size() == 2)
+    {
+        qDebug() << "Merging vertices";
+        VertexItem *start = verticesToMerge[0];
+        VertexItem *end   = verticesToMerge[1];
+
+        auto *newEdge = new EdgeItem(start, end, this);
+        edges.append(newEdge);
+        vertexEdges[start].append(newEdge);
+        vertexEdges[end].append(newEdge);
+    }
+
+    delete vertices[index];
+    vertices.removeAt(index);
+
+    prepareGeometryChange();
+    scene()->update();
+}
+
+void PolygonItem::deleteVertex(VertexItem *vertex)
+{
+    int index = vertices.indexOf(vertex);
+    if (index != -1)
+    {
+        deleteVertex(index);
     }
 }

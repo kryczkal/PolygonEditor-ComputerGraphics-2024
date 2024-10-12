@@ -61,14 +61,22 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
     mainLayout->addWidget(mainSplitter);
 
     // Connect button to the handler
-    connect(button1, &QPushButton::clicked, this, &MainWindow::HandleButton);
+    connect(button1, &QPushButton::clicked, this, &MainWindow::DeletePolygon);
+    connect(button2, &QPushButton::clicked, this, &MainWindow::AddVertex);
 }
 
-void MainWindow::HandleButton()
+MainWindow::~MainWindow() {}
+
+void MainWindow::DeletePolygon()
+{
+    delete polygonItem;
+    polygonItem = new PolygonItem();
+    scene->addItem(polygonItem);
+    scene->update();
+}
+void MainWindow::AddVertex()
 {
     QPointF position = QPointF(rand() % 500, rand() % 500);
     polygonItem->addVertex(position);
     scene->update();
 }
-
-MainWindow::~MainWindow() {}

@@ -21,9 +21,14 @@ class VertexItem : public QGraphicsItem
     void setPosition(const QPointF &newPosition);
     QPointF getPosition() const;
 
+    void contextMenuEvent(QGraphicsSceneContextMenuEvent *event) override;
+
     private:
     QPointF position;
     qreal radius = 5.0;
+
+    friend QDataStream &operator<<(QDataStream &out, const VertexItem &vertex);
+    friend class PolygonItem;
 };
 
 #endif // POLYGONEDITOR_VERTEXITEM_H

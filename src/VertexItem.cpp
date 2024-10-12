@@ -3,6 +3,10 @@
 //
 
 #include "VertexItem.h"
+#include "PolygonItem.h"
+#include <QAction>
+#include <QGraphicsSceneContextMenuEvent>
+#include <QMenu>
 
 VertexItem::VertexItem(const QPointF &position, QGraphicsItem *parent) : QGraphicsItem(parent), position{position} {}
 
@@ -24,3 +28,21 @@ void VertexItem::setPosition(const QPointF &newPosition)
 }
 
 QPointF VertexItem::getPosition() const { return position; }
+void VertexItem::contextMenuEvent(QGraphicsSceneContextMenuEvent *event)
+{
+    QMenu menu;
+    QAction *deleteAction   = menu.addAction("Delete");
+    QAction *selectedAction = menu.exec(event->screenPos());
+
+    PolygonItem *polygon = dynamic_cast<PolygonItem *>(parentItem());
+    if (selectedAction == deleteAction)
+    {
+        polygon->deleteVertex(this);
+    }
+}
+
+QDataStream &operator<<(QDataStream &out, const VertexItem &vertex)
+{
+    out << vertex.position;
+    return out;
+}
