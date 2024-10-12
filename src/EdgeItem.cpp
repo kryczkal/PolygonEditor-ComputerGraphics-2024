@@ -12,6 +12,7 @@
 EdgeItem::EdgeItem(VertexItem *start, VertexItem *end, QGraphicsItem *parent)
     : QGraphicsItem(parent), startVertex{start}, endVertex{end}
 {
+    QGraphicsItem::setZValue(0);
 }
 
 QRectF EdgeItem::boundingRect() const

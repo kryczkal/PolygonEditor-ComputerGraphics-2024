@@ -9,7 +9,10 @@
 #include "PolygonItem.h"
 #include "VertexItem.h"
 
-VertexItem::VertexItem(const QPointF &position, QGraphicsItem *parent) : QGraphicsItem(parent), position{position} {}
+VertexItem::VertexItem(const QPointF &position, QGraphicsItem *parent) : QGraphicsItem(parent), position{position}
+{
+    QGraphicsItem::setZValue(1);
+}
 
 QRectF VertexItem::boundingRect() const
 {
@@ -41,3 +44,5 @@ QDataStream &operator<<(QDataStream &out, const VertexItem &vertex)
     return out;
 }
 bool VertexItem::hasBothEdges() const { return edgeFrom != nullptr && edgeTo != nullptr; }
+
+bool VertexItem::hasOneEdge() const { return (!hasBothEdges() && (edgeFrom != nullptr || edgeTo != nullptr)); }

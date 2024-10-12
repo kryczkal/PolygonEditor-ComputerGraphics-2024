@@ -21,9 +21,12 @@ class VertexItem : public QGraphicsItem
 
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
 
-    EdgeItem* edgeFrom;
-    EdgeItem* edgeTo;
+    EdgeItem *edgeFrom = nullptr;
+    EdgeItem *edgeTo   = nullptr;
+
+    [[nodiscard]]
     bool hasBothEdges() const;
+    bool hasOneEdge() const;
 
     QPointF position;
     qreal radius = 5.0;

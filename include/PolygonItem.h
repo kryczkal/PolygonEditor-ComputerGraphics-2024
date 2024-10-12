@@ -41,7 +41,7 @@ class PolygonItem : public QGraphicsItem
 
     QList<VertexItem *> vertices;
     QList<EdgeItem *> edges;
-//    QHash<VertexItem *, QList<EdgeItem *>> vertexEdges;
+    //    QHash<VertexItem *, QList<EdgeItem *>> vertexEdges;
     int selectedVertexIndex;
 
     FRIEND_TEST(PolygonItemTest, CheckLinearOrdering);
