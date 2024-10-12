@@ -17,7 +17,7 @@ class PolygonItem : public QGraphicsItem
     QRectF boundingRect() const override;
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
 
-    void addVertex(const QPointF &position);
+    void appendVertex(const QPointF &position);
 
     void deleteVertex(unsigned int index);
     void deleteVertex(VertexItem *vertex);
@@ -33,8 +33,8 @@ class PolygonItem : public QGraphicsItem
     void mouseReleaseEvent(QGraphicsSceneMouseEvent *event) override;
 
     private:
-    void addEdge(EdgeItem *edge, int idx = -1);
-    void removeEdge(EdgeItem *edge);
+    void addEdge(EdgeItem *edge, unsigned int idx = -1);
+    void deleteEdge(EdgeItem *edge);
     int findClosestVertex(const QPointF &pos);
 
     bool checkLinearOrdering();

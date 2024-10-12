@@ -89,10 +89,10 @@ QDataStream &operator<<(QDataStream &out, const EdgeItem &edge)
 }
 void EdgeItem::contextMenuEvent(QGraphicsSceneContextMenuEvent *event)
 {
-    //    QMenu menu;
-    //    QAction *subdivideAction = menu.addAction("Subdivide");
-    //    QAction *selectedAction  = menu.exec(event->screenPos());
-    //
-    //    PolygonItem *polygon = dynamic_cast<PolygonItem *>(parentItem());
-    //    polygon->subdivideEdge(this);
+    QMenu menu;
+    QAction *subdivideAction = menu.addAction("Subdivide");
+    QAction *selectedAction  = menu.exec(event->screenPos());
+
+    PolygonItem *polygon = dynamic_cast<PolygonItem *>(parentItem());
+    polygon->subdivideEdge(this);
 }

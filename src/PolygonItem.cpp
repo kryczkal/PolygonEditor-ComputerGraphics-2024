@@ -50,7 +50,7 @@ void PolygonItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *qStyl
 ////////////////////////////////////////////////////////////////////////////////
 //                              Vertex Functions                              //
 ////////////////////////////////////////////////////////////////////////////////
-void PolygonItem::addVertex(const QPointF &position)
+void PolygonItem::appendVertex(const QPointF &position)
 {
     VertexItem *newVertex = new VertexItem(position, this);
     vertices.append(newVertex);
@@ -68,7 +68,7 @@ void PolygonItem::addVertex(const QPointF &position)
         Q_ASSERT(firstVertex->edgeFrom != nullptr && firstVertex->edgeTo != nullptr);
         Q_ASSERT(lastVertex->edgeFrom != nullptr && lastVertex->edgeTo != nullptr);
 
-        removeEdge(lastEdge);
+        deleteEdge(lastEdge);
     }
 
     if (vertices.size() > 1)
@@ -113,9 +113,9 @@ void PolygonItem::deleteVertex(unsigned int index)
         Q_ASSERT(vertex->hasOneEdge());
 
         if (vertex->edgeTo != nullptr)
-            removeEdge(vertex->edgeTo);
+            deleteEdge(vertex->edgeTo);
         else
-            removeEdge(vertex->edgeFrom);
+            deleteEdge(vertex->edgeFrom);
     }
     else if (vertices.size() > 2)
     {
@@ -127,8 +127,8 @@ void PolygonItem::deleteVertex(unsigned int index)
         EdgeItem *mergeEdge = new EdgeItem(prevEdge->startVertex, nextEdge->endVertex);
 
         int mergeIdx = edges.indexOf(prevEdge);
-        removeEdge(prevEdge);
-        removeEdge(nextEdge);
+        deleteEdge(prevEdge);
+        deleteEdge(nextEdge);
         if (vertices.size() > 3)
             addEdge(mergeEdge, mergeIdx);
     }
@@ -155,43 +155,26 @@ void PolygonItem::deleteVertex(VertexItem *vertex)
 ////////////////////////////////////////////////////////////////////////////////
 void PolygonItem::subdivideEdge(EdgeItem *edge)
 {
-    //        VertexItem *start = edge->startVertex;
-    //        VertexItem *end = edge->endVertex;
-    //
-    //        QPointF midPoint = (start->position + end->position) / 2;
-    //        addVertex(midPoint);
-    //
-    //        // Find the index of the new vertex
-    //        int index = vertices.size() - 1;
-    //
-    //        // Find the index of the edge
-    //        int edgeIndex = edges.indexOf(edge);
-    //
-    //        // Remove the edge
-    //        edges.removeAt(edgeIndex);
-    //        delete edge;
-    //
-    //        // Create two new edges
-    //        EdgeItem *firstEdge = new EdgeItem(start, vertices[index], this);
-    //        EdgeItem *secondEdge = new EdgeItem(vertices[index], end, this);
-    //
-    //        edges.insert(edgeIndex, firstEdge);
-    //        edges.insert(edgeIndex + 1, secondEdge);
-    //
-    //        vertexEdges[start].removeOne(edge);
-    //        vertexEdges[end].removeOne(edge);
-    //
-    //        vertexEdges[start].append(firstEdge);
-    //        vertexEdges[vertices[index]].append(firstEdge);
-    //
-    //        vertexEdges[vertices[index]].append(secondEdge);
-    //        vertexEdges[end].append(secondEdge);
-    //
+    Q_ASSERT(edge->startVertex != edge->endVertex);
+    Q_ASSERT(edges.contains(edge));
+    Q_ASSERT(vertices.contains(edge->startVertex));
+    Q_ASSERT(vertices.contains(edge->endVertex));
+    Q_ASSERT(edge->startVertex->edgeFrom == edge || edge->startVertex->edgeTo == edge);
+
+    VertexItem *start = edge->startVertex;
+    VertexItem *end   = edge->endVertex;
+
+    QPointF midPoint         = (start->position + end->position) / 2;
+    unsigned int midPointIdx = vertices.indexOf(start);
+    addEdge(new EdgeItem(start, vertices[midPointIdx]), midPointIdx);
+    addEdge(new EdgeItem(vertices[midPointIdx], end), midPointIdx + 1);
+    deleteEdge(edge);
+
     //        prepareGeometryChange();
     //        scene()->update();
 }
 
-void PolygonItem::addEdge(EdgeItem *edge, int idx)
+void PolygonItem::addEdge(EdgeItem *edge, unsigned int idx)
 {
     Q_ASSERT(edge->startVertex != edge->endVertex);
 
@@ -203,7 +186,7 @@ void PolygonItem::addEdge(EdgeItem *edge, int idx)
     edge->startVertex->edgeFrom = edge;
     edge->endVertex->edgeTo     = edge;
 }
-void PolygonItem::removeEdge(EdgeItem *edge)
+void PolygonItem::deleteEdge(EdgeItem *edge)
 {
     Q_ASSERT(edge->startVertex->edgeFrom == edge || edge->startVertex->edgeTo == edge);
 

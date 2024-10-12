@@ -78,6 +78,6 @@ void MainWindow::DeletePolygon()
 void MainWindow::AddVertex()
 {
     QPointF position = QPointF(rand() % 500, rand() % 500);
-    polygonItem->addVertex(position);
+    polygonItem->appendVertex(position);
     scene->update();
 }

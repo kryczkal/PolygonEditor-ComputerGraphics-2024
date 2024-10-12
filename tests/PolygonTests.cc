@@ -11,10 +11,10 @@ TEST(PolygonItemTest, Constructor)
 TEST(PolygonItemTest, CheckLinearOrdering)
 {
     PolygonItem polygonItem;
-    polygonItem.addVertex(QPointF(0, 0));
-    polygonItem.addVertex(QPointF(0, 1));
-    polygonItem.addVertex(QPointF(1, 1));
-    polygonItem.addVertex(QPointF(1, 0));
+    polygonItem.appendVertex(QPointF(0, 0));
+    polygonItem.appendVertex(QPointF(0, 1));
+    polygonItem.appendVertex(QPointF(1, 1));
+    polygonItem.appendVertex(QPointF(1, 0));
     EXPECT_TRUE(polygonItem.checkLinearOrdering());
 
     polygonItem.vertices.swapItemsAt(1, 2);
