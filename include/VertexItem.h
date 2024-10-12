@@ -10,6 +10,8 @@
 #include <QPainter>
 #include <gtest/gtest.h>
 
+class EdgeItem; // Forward declaration
+
 class VertexItem : public QGraphicsItem
 {
     public:
@@ -19,13 +21,14 @@ class VertexItem : public QGraphicsItem
 
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
 
-    void setPosition(const QPointF &newPosition);
-    QPointF getPosition() const;
+    EdgeItem* edgeFrom;
+    EdgeItem* edgeTo;
+    bool hasBothEdges() const;
 
-    private:
     QPointF position;
     qreal radius = 5.0;
 
+    private:
     void contextMenuEvent(QGraphicsSceneContextMenuEvent *event) override;
 
     friend QDataStream &operator<<(QDataStream &out, const VertexItem &vertex);

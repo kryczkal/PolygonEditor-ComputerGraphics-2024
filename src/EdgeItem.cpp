@@ -16,7 +16,7 @@ EdgeItem::EdgeItem(VertexItem *start, VertexItem *end, QGraphicsItem *parent)
 
 QRectF EdgeItem::boundingRect() const
 {
-    return QRectF(startVertex->getPosition(), endVertex->getPosition()).normalized().adjusted(-2, -2, 2, 2);
+    return QRectF(startVertex->position, endVertex->position).normalized().adjusted(-2, -2, 2, 2);
 }
 
 void EdgeItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *)
@@ -25,12 +25,12 @@ void EdgeItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidge
     {
         painter->setRenderHint(QPainter::Antialiasing, false);
         painter->setPen(QPen(Qt::black, 1));
-        bresenham(painter, startVertex->getPosition(), endVertex->getPosition(), width);
+        bresenham(painter, startVertex->position, endVertex->position, width);
     }
     else
     {
         painter->setPen(QPen(Qt::black, width));
-        painter->drawLine(startVertex->getPosition(), endVertex->getPosition());
+        painter->drawLine(startVertex->position, endVertex->position);
     }
 }
 void EdgeItem::bresenham(QPainter *painter, const QPointF &start, const QPointF &end, qreal width)
@@ -83,7 +83,7 @@ void EdgeItem::bresenham(QPainter *painter, const QPointF &start, const QPointF 
 
 QDataStream &operator<<(QDataStream &out, const EdgeItem &edge)
 {
-    out << "(" << edge.startVertex->getPosition() << ", " << edge.endVertex->getPosition() << ")";
+    out << "(" << edge.startVertex->position << ", " << edge.endVertex->position << ")";
     return out;
 }
 void EdgeItem::contextMenuEvent(QGraphicsSceneContextMenuEvent *event)

@@ -22,13 +22,6 @@ void VertexItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWid
     painter->drawEllipse(position, radius, radius);
 }
 
-void VertexItem::setPosition(const QPointF &newPosition)
-{
-    position = newPosition;
-    update();
-}
-
-QPointF VertexItem::getPosition() const { return position; }
 void VertexItem::contextMenuEvent(QGraphicsSceneContextMenuEvent *event)
 {
     QMenu menu;
@@ -47,3 +40,4 @@ QDataStream &operator<<(QDataStream &out, const VertexItem &vertex)
     out << vertex.position;
     return out;
 }
+bool VertexItem::hasBothEdges() const { return edgeFrom != nullptr && edgeTo != nullptr; }

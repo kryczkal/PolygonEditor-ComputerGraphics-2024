@@ -15,12 +15,12 @@ QRectF PolygonItem::boundingRect() const
     if (vertices.isEmpty())
         return QRectF();
 
-    qreal minX = vertices[0]->getPosition().x(), minY = vertices[0]->getPosition().y();
+    qreal minX = vertices[0]->position.x(), minY = vertices[0]->position.y();
     qreal maxX = minX, maxY = minY;
 
     for (const auto &vertex : vertices)
     {
-        QPointF pos = vertex->getPosition();
+        QPointF pos = vertex->position;
         if (pos.x() < minX)
             minX = pos.x();
         if (pos.y() < minY)
@@ -64,7 +64,9 @@ void PolygonItem::addVertex(const QPointF &position)
         VertexItem *lastVertex  = vertices[vertices.size() - 2];
 
         assert(lastEdge->startVertex == lastVertex && lastEdge->endVertex == firstVertex);
-        assert(vertexEdges[firstVertex].size() == 2 && vertexEdges[lastVertex].size() == 2);
+        assert(firstVertex->edgeTo == lastEdge && lastVertex->edgeFrom == lastEdge);
+        assert(firstVertex->edgeFrom != nullptr && firstVertex->edgeTo != nullptr);
+        assert(lastVertex->edgeFrom != nullptr && lastVertex->edgeTo != nullptr);
 
         removeEdge(lastEdge);
     }
@@ -84,8 +86,9 @@ void PolygonItem::addVertex(const QPointF &position)
         VertexItem *lastVertex  = vertices[vertices.size() - 1];
 
         assert(firstVertex != lastVertex);
-        assert(vertexEdges.contains(firstVertex) && vertexEdges.contains(lastVertex));
-        assert(vertexEdges[firstVertex].size() == 1 && vertexEdges[lastVertex].size() == 1);
+
+        assert(firstVertex->edgeTo == nullptr && lastVertex->edgeFrom == nullptr);
+        assert(firstVertex->edgeFrom != nullptr && lastVertex->edgeTo != nullptr);
 
         EdgeItem *closingEdge = new EdgeItem(lastVertex, firstVertex, this);
         addEdge(closingEdge);
@@ -105,17 +108,20 @@ void PolygonItem::deleteVertex(unsigned int index)
 
     VertexItem *vertex = vertices[index];
 
-    assert(vertices.size() <= 1 || vertexEdges.contains(vertex));
-    assert(vertices.size() <= 2 || vertexEdges[vertex].size() == 2);
+    assert(vertices.size() <= 1 || (vertex->edgeTo != nullptr || vertex->edgeFrom != nullptr));
+    assert(vertices.size() <= 2 || (vertex->edgeTo != nullptr && vertex->edgeFrom != nullptr));
 
     if (vertices.size() == 2)
     {
-        removeEdge(vertexEdges[vertex][0]);
+        if (vertex->edgeTo != nullptr)
+            removeEdge(vertex->edgeTo);
+        else
+            removeEdge(vertex->edgeFrom);
     }
     else if (vertices.size() > 2)
     {
-        EdgeItem *prevEdge = vertexEdges[vertex][0];
-        EdgeItem *nextEdge = vertexEdges[vertex][1];
+        EdgeItem *prevEdge = vertex->edgeFrom;
+        EdgeItem *nextEdge = vertex->edgeTo;
 
         EdgeItem *mergeEdge = new EdgeItem(prevEdge->startVertex, nextEdge->endVertex);
 
@@ -150,7 +156,7 @@ void PolygonItem::subdivideEdge(EdgeItem *edge)
     //        VertexItem *start = edge->startVertex;
     //        VertexItem *end = edge->endVertex;
     //
-    //        QPointF midPoint = (start->getPosition() + end->getPosition()) / 2;
+    //        QPointF midPoint = (start->position + end->position) / 2;
     //        addVertex(midPoint);
     //
     //        // Find the index of the new vertex
@@ -185,23 +191,24 @@ void PolygonItem::subdivideEdge(EdgeItem *edge)
 
 void PolygonItem::addEdge(EdgeItem *edge, int idx)
 {
-    assert(vertexEdges[edge->startVertex].size() < 2 && vertexEdges[edge->endVertex].size() < 2);
+    assert(edge->startVertex != edge->endVertex);
 
     if (idx == -1)
         edges.append(edge);
     else
         edges.insert(idx, edge);
 
-    vertexEdges[edge->startVertex].push_back(edge);
-    vertexEdges[edge->endVertex].push_front(edge);
+    edge->startVertex->edgeFrom = edge;
+    edge->endVertex->edgeTo      = edge;
 }
 void PolygonItem::removeEdge(EdgeItem *edge)
 {
-    assert(vertexEdges.contains(edge->startVertex) && vertexEdges.contains(edge->endVertex));
-    assert(vertexEdges[edge->startVertex].contains(edge) && vertexEdges[edge->endVertex].contains(edge));
+    assert( !(edge->startVertex->edgeFrom != nullptr && edge->startVertex->edgeTo != nullptr) );
+    assert( !(edge->endVertex->edgeFrom != nullptr && edge->endVertex->edgeTo != nullptr) );
+    assert (edge->startVertex->edgeFrom == edge || edge->startVertex->edgeTo == edge);
 
-    vertexEdges[edge->startVertex].removeOne(edge);
-    vertexEdges[edge->endVertex].removeOne(edge);
+    edge->startVertex->edgeFrom = nullptr;
+    edge->endVertex->edgeTo      = nullptr;
 
     edges.removeOne(edge);
     delete edge;
@@ -223,7 +230,7 @@ void PolygonItem::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
 {
     if (selectedVertexIndex != -1)
     {
-        vertices[selectedVertexIndex]->setPosition(event->pos());
+        vertices[selectedVertexIndex]->position = event->pos();
         scene()->views().first()->centerOn(vertices[selectedVertexIndex]);
         scene()->update();
     }
@@ -256,7 +263,7 @@ int PolygonItem::findClosestVertex(const QPointF &pos)
 
     for (int i = 0; i < vertices.size(); ++i)
     {
-        if (QLineF(pos, vertices[i]->getPosition()).length() < tolerance)
+        if (QLineF(pos, vertices[i]->position).length() < tolerance)
         {
             return i;
         }
@@ -314,7 +321,7 @@ bool PolygonItem::checkLinearOrdering()
         VertexItem *vertex = vertices[i];
 
         // Each vertex in a valid polygon should have exactly 2 edges
-        if (vertexEdges[vertex].size() != 2)
+        if (!vertex->hasBothEdges())
         {
             printOrderingStatus(vertex, QString("Vertex %1 does not have exactly two edges.").arg(i));
             return false;
@@ -403,19 +410,19 @@ void PolygonItem::printOrderingStatus(VertexItem *vertex, const QString &message
     for (int i = 0; i < vertices.size(); ++i)
     {
         VertexItem *v = vertices[i];
-        qDebug() << "Vertex" << i << ": Position:" << v->getPosition();
+        qDebug() << "Vertex" << i << ": Position:" << v->position;
 
         for (EdgeItem *edge : vertexEdges[v])
         {
             qDebug() << " Edge" << edges.indexOf(edge) << "(" << vertices.indexOf(edge->startVertex) << ","
-                     << vertices.indexOf(edge->endVertex) << ")" << "from position" << edge->startVertex->getPosition()
-                     << "to position" << edge->endVertex->getPosition();
+                     << vertices.indexOf(edge->endVertex) << ")" << "from position" << edge->startVertex->position
+                     << "to position" << edge->endVertex->position;
         }
     }
 
     if (vertex != nullptr)
     {
-        qDebug() << "Issue detected at vertex with position:" << vertex->getPosition() << "Message:" << message;
+        qDebug() << "Issue detected at vertex with position:" << vertex->position << "Message:" << message;
     }
 }
 
@@ -436,5 +443,4 @@ PolygonItem::~PolygonItem()
 
     vertices.clear();
     edges.clear();
-    vertexEdges.clear();
 }
