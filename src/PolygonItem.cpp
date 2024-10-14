@@ -104,15 +104,17 @@ void PolygonItem::appendVertex(const QPointF &position)
  * Insert a new vertex at the specified index with the given position. Connect the new vertex to the previous and next
  * vertices with new edges. The new vertex will be inserted at the specified index, moving all subsequent vertices
  */
-void PolygonItem::insertVertex(unsigned int index, const QPointF &position) {
-    if (index >= vertices.size() || vertices.size() < 3) {
+void PolygonItem::insertVertex(unsigned int index, const QPointF &position)
+{
+    if (index >= vertices.size() || vertices.size() < 3)
+    {
         appendVertex(position);
         return;
     }
     VertexItem *newVertex = new VertexItem(position, this);
 
     VertexItem *prevVertex = vertices[index];
-    VertexItem *nextVertex = vertices[ (index + 1) % vertices.size() ];
+    VertexItem *nextVertex = vertices[(index + 1) % vertices.size()];
 
     vertices.insert(index + 1, newVertex);
     deleteEdge(prevVertex->edgeFrom);
@@ -120,8 +122,6 @@ void PolygonItem::insertVertex(unsigned int index, const QPointF &position) {
     addEdge(new EdgeItem(newVertex, nextVertex, this), index + 1);
 
     prepareGeometryChange();
-    scene()->update();
-
     assert(checkLinearOrdering());
 }
 
@@ -161,8 +161,6 @@ void PolygonItem::deleteVertex(unsigned int index)
     delete vertex;
 
     prepareGeometryChange();
-    scene()->update();
-
     Q_ASSERT(checkLinearOrdering());
 }
 
@@ -189,7 +187,6 @@ void PolygonItem::subdivideEdge(EdgeItem *edge)
     insertVertex(edgeIndex, (edge->startVertex->position + edge->endVertex->position) / 2.0);
 
     prepareGeometryChange();
-    scene()->update();
 }
 
 void PolygonItem::addEdge(EdgeItem *edge, unsigned int idx)
@@ -250,17 +247,15 @@ void PolygonItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *)
 ////////////////////////////////////////////////////////////////////////////////
 //                              Helper Functions                              //
 ////////////////////////////////////////////////////////////////////////////////
-void PolygonItem::toggleIndexVisibility() {
+void PolygonItem::toggleIndexVisibility()
+{
     paintIndex = !paintIndex;
     scene()->update();
 }
-int PolygonItem::getVertexIndex(VertexItem *vertex) const {
-    return vertices.indexOf(vertex);
-}
+void PolygonItem::toggleMoveAllVertices() { moveAllVertices = !moveAllVertices; }
+int PolygonItem::getVertexIndex(VertexItem *vertex) const { return vertices.indexOf(vertex); }
 
-int PolygonItem::getEdgeIndex(EdgeItem *edge) const {
-    return edges.indexOf(edge);
-}
+int PolygonItem::getEdgeIndex(EdgeItem *edge) const { return edges.indexOf(edge); }
 int PolygonItem::findClosestVertex(const QPointF &pos)
 {
     QList<QGraphicsView *> views = scene()->views();
@@ -445,5 +440,3 @@ PolygonItem::~PolygonItem()
     vertices.clear();
     edges.clear();
 }
-
-

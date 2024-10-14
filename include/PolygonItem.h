@@ -29,8 +29,10 @@ class PolygonItem : public QGraphicsItem
     int getVertexIndex(VertexItem *vertex) const;
     int getEdgeIndex(EdgeItem *edge) const;
     void toggleIndexVisibility();
+    void toggleMoveAllVertices();
 
-    bool paintIndex = true;
+    bool paintIndex      = true;
+    bool moveAllVertices = false;
 
     ~PolygonItem();
 

@@ -27,7 +27,8 @@ void VertexItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWid
 
     // Paint the number of the vertex
     PolygonItem *polygon = dynamic_cast<PolygonItem *>(parentItem());
-    if (polygon->paintIndex) {
+    if (polygon->paintIndex)
+    {
         // Get the text to display
         QString text = QString::number(static_cast<int>(polygon->getVertexIndex(this)));
 
@@ -44,7 +45,7 @@ void VertexItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWid
         painter->drawPath(path);
 
         // Fill the text with white color
-        painter->setPen(Qt::NoPen);  // Disable the pen for filling
+        painter->setPen(Qt::NoPen); // Disable the pen for filling
         painter->setBrush(Qt::white);
         painter->drawPath(path);
     }

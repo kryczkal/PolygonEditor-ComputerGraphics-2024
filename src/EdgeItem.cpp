@@ -39,7 +39,7 @@ void EdgeItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidge
     if (polygon->paintIndex)
     {
         QPointF center = (startVertex->position + endVertex->position) / 2;
-        QString text = QString::number(static_cast<int>(polygon->getEdgeIndex(this)));
+        QString text   = QString::number(static_cast<int>(polygon->getEdgeIndex(this)));
 
         QPainterPath path;
         path.addText(center, painter->font(), text);
@@ -52,7 +52,8 @@ void EdgeItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidge
         painter->setPen(Qt::NoPen);
         painter->setBrush(Qt::white);
         painter->drawPath(path);
-    }}
+    }
+}
 void EdgeItem::bresenham(QPainter *painter, const QPointF &start, const QPointF &end, qreal width)
 {
     // Bresenham's line algorithm
