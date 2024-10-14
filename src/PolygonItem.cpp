@@ -111,7 +111,6 @@ void PolygonItem::insertVertex(unsigned int index, const QPointF &position)
     assert(checkLinearOrdering());
 }
 
-// TODO: bugged for 3 vertices (preserves edge (1, 0), should reorder it to be (0, 1))
 void PolygonItem::deleteVertex(unsigned int index)
 {
     if (index >= vertices.size())
@@ -128,7 +127,23 @@ void PolygonItem::deleteVertex(unsigned int index)
         else
             deleteEdge(vertex->edgeFrom);
     }
-    else if (vertices.size() > 2)
+    else if (vertices.size() == 3)
+    {
+        // If is a triangle, remove the vertex and the edges, and add a new edge between the remaining vertices ensuring
+        // the correct order
+        Q_ASSERT(vertex->hasBothEdges());
+
+        EdgeItem *prevEdge = vertex->edgeTo;
+        EdgeItem *nextEdge = vertex->edgeFrom;
+        for (auto e : edges)
+        {
+            deleteEdge(e);
+        }
+        int lowerIdx  = std::min(vertices.indexOf(prevEdge->startVertex), vertices.indexOf(nextEdge->endVertex));
+        int higherIdx = std::max(vertices.indexOf(prevEdge->startVertex), vertices.indexOf(nextEdge->endVertex));
+        addEdge(new EdgeItem(vertices[lowerIdx], vertices[higherIdx], this));
+    }
+    else if (vertices.size() > 3)
     {
         Q_ASSERT(vertex->hasBothEdges());
 
@@ -140,14 +155,7 @@ void PolygonItem::deleteVertex(unsigned int index)
         int mergeIdx = edges.indexOf(prevEdge);
         deleteEdge(prevEdge);
         deleteEdge(nextEdge);
-        if (vertices.size() > 3)
-        {
-            addEdge(mergeEdge, mergeIdx);
-        }
-        else
-        {
-            delete mergeEdge;
-        }
+        addEdge(mergeEdge, mergeIdx);
     }
 
     vertices.removeOne(vertex);
