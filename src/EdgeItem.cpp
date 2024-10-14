@@ -12,6 +12,7 @@
 EdgeItem::EdgeItem(VertexItem *start, VertexItem *end, QGraphicsItem *parent)
     : QGraphicsItem(parent), startVertex{start}, endVertex{end}
 {
+    assert(dynamic_cast<PolygonItem *>(parent) != nullptr); // Parent must be a PolygonItem
     QGraphicsItem::setZValue(0);
 }
 
@@ -33,7 +34,25 @@ void EdgeItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidge
         painter->setPen(QPen(Qt::black, width));
         painter->drawLine(startVertex->position, endVertex->position);
     }
-}
+
+    PolygonItem *polygon = dynamic_cast<PolygonItem *>(parentItem());
+    if (polygon->paintIndex)
+    {
+        QPointF center = (startVertex->position + endVertex->position) / 2;
+        QString text = QString::number(static_cast<int>(polygon->getEdgeIndex(this)));
+
+        QPainterPath path;
+        path.addText(center, painter->font(), text);
+
+        QPen pen(Qt::black, 3.0);
+        painter->setPen(pen);
+        painter->setBrush(Qt::NoBrush);
+        painter->drawPath(path);
+
+        painter->setPen(Qt::NoPen);
+        painter->setBrush(Qt::white);
+        painter->drawPath(path);
+    }}
 void EdgeItem::bresenham(QPainter *painter, const QPointF &start, const QPointF &end, qreal width)
 {
     // Bresenham's line algorithm

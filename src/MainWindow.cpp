@@ -31,9 +31,9 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
     leftToolBar->setMaximumWidth(350);
 
     QVBoxLayout *leftLayout = new QVBoxLayout(leftToolBar);
-    QPushButton *button1    = new QPushButton("Button 1", leftToolBar);
-    QPushButton *button2    = new QPushButton("Button 2", leftToolBar);
-    QPushButton *button3    = new QPushButton("Button 3", leftToolBar);
+    QPushButton *button1    = new QPushButton("Delete Polygon", leftToolBar);
+    QPushButton *button2    = new QPushButton("Add Vertex", leftToolBar);
+    QPushButton *button3    = new QPushButton("Toggle index visibility", leftToolBar);
 
     leftLayout->addWidget(button1);
     leftLayout->addWidget(button2);

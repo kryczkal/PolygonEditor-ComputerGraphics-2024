@@ -12,6 +12,12 @@
 
 class EdgeItem; // Forward declaration
 
+/*
+ * @brief Class representing a vertex in the polygon
+ * @details The class is responsible for drawing the vertex on the scene and handling the context menu
+ * @param position - position of the vertex
+ * @param parent - parent item - (It is required that the parent item is a PolygonItem)
+ */
 class VertexItem : public QGraphicsItem
 {
     public:

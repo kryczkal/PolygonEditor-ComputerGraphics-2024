@@ -18,12 +18,19 @@ class PolygonItem : public QGraphicsItem
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
 
     void appendVertex(const QPointF &position);
+    void insertVertex(unsigned int index, const QPointF &position);
 
     void deleteVertex(unsigned int index);
     void deleteVertex(VertexItem *vertex);
 
     void subdivideEdge(unsigned int index);
     void subdivideEdge(EdgeItem *edge);
+
+    int getVertexIndex(VertexItem *vertex) const;
+    int getEdgeIndex(EdgeItem *edge) const;
+    void toggleIndexVisibility();
+
+    bool paintIndex = true;
 
     ~PolygonItem();
 
@@ -41,7 +48,6 @@ class PolygonItem : public QGraphicsItem
 
     QList<VertexItem *> vertices;
     QList<EdgeItem *> edges;
-    //    QHash<VertexItem *, QList<EdgeItem *>> vertexEdges;
     int selectedVertexIndex;
 
     FRIEND_TEST(PolygonItemTest, CheckLinearOrdering);

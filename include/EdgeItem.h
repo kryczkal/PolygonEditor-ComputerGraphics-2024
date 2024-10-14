@@ -12,6 +12,13 @@
 
 #include "VertexItem.h"
 
+/*
+ * @brief Class representing an edge in the polygon
+ * @details The class is responsible for drawing the edge on the scene and handling the context menu
+ * @param start - start vertex of the edge
+ * @param end - end vertex of the edge
+ * @param parent - parent item - (It is required that the parent item is a PolygonItem)
+ */
 class EdgeItem : public QGraphicsItem
 {
     public:
