@@ -1,9 +1,15 @@
 #include "EdgeItem.h"
+#include "Constraints/ConstraintChecker.h"
+#include "Constraints/HorizontalEdgeConstraint.h"
+#include "Constraints/LengthEdgeConstraint.h"
+#include "Constraints/VerticalEdgeConstraint.h"
 #include "PolygonItem.h"
 #include "VertexItem.h"
 #include <QAction>
+#include <QGraphicsScene>
 #include <QGraphicsSceneContextMenuEvent>
 #include <QMenu>
+#include <QObject>
 #include <QPainter>
 #include <cassert>
 
@@ -116,8 +122,75 @@ void EdgeItem::contextMenuEvent(QGraphicsSceneContextMenuEvent *event)
 {
     QMenu menu;
     QAction *subdivideAction = menu.addAction("Subdivide");
-    QAction *selectedAction  = menu.exec(event->screenPos());
+    QIODevice::connect(
+        subdivideAction, &QAction::triggered,
+        [this]
+        {
+            PolygonItem *polygon = dynamic_cast<PolygonItem *>(parentItem());
+            polygon->subdivideEdge(this);
+        }
+    );
 
-    PolygonItem *polygon = dynamic_cast<PolygonItem *>(parentItem());
-    polygon->subdivideEdge(this);
+    QAction *setHorizontalConstraintAction;
+    QAction *setVerticalConstraintAction;
+    QAction *setLengthConstraintAction;
+    QAction *removeConstraintAction;
+
+    if (constraint)
+    {
+        removeConstraintAction = menu.addAction("Remove Constraint");
+        QIODevice::connect(
+            removeConstraintAction, &QAction::triggered,
+            [this]
+            {
+                delete constraint;
+                constraint = nullptr;
+            }
+        );
+    }
+    else
+    {
+        setHorizontalConstraintAction = menu.addAction("Set Horizontal Constraint");
+        QIODevice::connect(
+            setHorizontalConstraintAction, &QAction::triggered,
+            [this]
+            {
+                constraint = new HorizontalEdgeConstraint();
+                ConstraintChecker::runApply(this, this);
+                scene()->update();
+            }
+        );
+        setVerticalConstraintAction = menu.addAction("Set Vertical Constraint");
+        QIODevice::connect(
+            setVerticalConstraintAction, &QAction::triggered,
+            [this]
+            {
+                constraint = new VerticalEdgeConstraint();
+                ConstraintChecker::runApply(this, this);
+                scene()->update();
+            }
+        );
+        setLengthConstraintAction = menu.addAction("Set Length Constraint");
+        QIODevice::connect(
+            setLengthConstraintAction, &QAction::triggered,
+            [&]
+            {
+                constraint = new LengthEdgeConstraint(QLineF(startVertex->pos(), endVertex->pos()).length());
+                ConstraintChecker::runApply(this, this);
+                scene()->update();
+            }
+        );
+    }
+
+    menu.exec(event->screenPos());
 }
+
+BaseEdgeConstraint *EdgeItem::getConstraint() const { return constraint; }
+
+void EdgeItem::setConstraint(BaseEdgeConstraint *constraint) { EdgeItem::constraint = constraint; }
+
+VertexItem *EdgeItem::getStartVertex() const { return startVertex; }
+
+VertexItem *EdgeItem::getEndVertex() const { return endVertex; }
+
+EdgeItem::~EdgeItem() { delete constraint; }

@@ -7,7 +7,7 @@
 #include <QPainter>
 #include <gtest/gtest.h>
 
-#include "EdgeItem.h"
+class EdgeItem;
 
 class PolygonItem : public QGraphicsItem
 {

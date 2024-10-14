@@ -5,12 +5,14 @@
 #ifndef POLYGONEDITOR_EDGEITEM_H
 #define POLYGONEDITOR_EDGEITEM_H
 
+#include <QAction>
 #include <QGraphicsItem>
 #include <QList>
 #include <QPainter>
 #include <gtest/gtest.h>
 
-#include "VertexItem.h"
+class VertexItem;
+class BaseEdgeConstraint;
 
 /*
  * @brief Class representing an edge in the polygon
@@ -28,6 +30,14 @@ class EdgeItem : public QGraphicsItem
 
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
 
+    VertexItem *getStartVertex() const;
+    VertexItem *getEndVertex() const;
+
+    void setConstraint(BaseEdgeConstraint *constraint);
+    BaseEdgeConstraint *getConstraint() const;
+
+    ~EdgeItem() override;
+
     private:
     static constexpr bool useBresenham = true;
 
@@ -35,11 +45,17 @@ class EdgeItem : public QGraphicsItem
     VertexItem *endVertex;
     qreal width = 2.0;
 
+    BaseEdgeConstraint *constraint = nullptr;
+
     void contextMenuEvent(QGraphicsSceneContextMenuEvent *event) override;
     void bresenham(QPainter *painter, const QPointF &start, const QPointF &end, qreal width);
 
     friend QDataStream &operator<<(QDataStream &out, const EdgeItem &edge);
     friend class PolygonItem;
+
+    void handleContextMenuAction(QAction *selectedAction);
+
+    void createContextMenu(QMenu *menu);
 };
 
 #endif // POLYGONEDITOR_EDGEITEM_H

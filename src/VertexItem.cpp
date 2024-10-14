@@ -1,10 +1,13 @@
 #include "VertexItem.h"
+#include "Constraints/ConstraintChecker.h"
+#include "EdgeItem.h"
 #include "PolygonItem.h"
 #include <QAction>
 #include <QGraphicsSceneContextMenuEvent>
 #include <QGraphicsSceneMouseEvent>
 #include <QGraphicsView>
 #include <QMenu>
+#include <QMessageBox>
 #include <QPainter>
 
 static constexpr qreal radius = 5.0;
@@ -64,9 +67,9 @@ QDataStream &operator<<(QDataStream &out, const VertexItem &vertex)
     return out;
 }
 
-bool VertexItem::hasBothEdges() const { return edgeFrom != nullptr && edgeTo != nullptr; }
+bool VertexItem::hasBothEdges() const { return edgeOut != nullptr && edgeIn != nullptr; }
 
-bool VertexItem::hasOneEdge() const { return (!hasBothEdges() && (edgeFrom != nullptr || edgeTo != nullptr)); }
+bool VertexItem::hasOneEdge() const { return (!hasBothEdges() && (edgeOut != nullptr || edgeIn != nullptr)); }
 
 void VertexItem::mousePressEvent(QGraphicsSceneMouseEvent *event)
 {
@@ -85,6 +88,24 @@ void VertexItem::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
 
     QPointF delta = event->pos() - event->lastPos();
     moveBy(delta.x(), delta.y());
+
+    bool flipDirection = false;
+    bool canMove       = true;
+    if (edgeIn && edgeIn->getConstraint())
+        flipDirection = true;
+    if (flipDirection && edgeOut && edgeOut->getConstraint())
+        canMove = false;
+
+    if (canMove && !flipDirection)
+        ConstraintChecker::runApply(edgeOut, edgeOut);
+    else if (canMove)
+        ConstraintChecker::runApply(edgeIn, edgeIn, SearchDirection::Backward);
+    else
+    {
+        polygon->moveBy(delta.x(), delta.y());
+        moveBy(-delta.x(), -delta.y());
+    }
+
     prepareGeometryChange();
     scene()->update();
 }
