@@ -28,5 +28,9 @@ class MainWindow : public QMainWindow
     private:
     QGraphicsScene *scene;
     PolygonItem *polygonItem;
+
+    void ToggleMoveAllVertices();
+
+    void ToggleIndexVisibility();
 };
 #endif // MAINWINDOW_H

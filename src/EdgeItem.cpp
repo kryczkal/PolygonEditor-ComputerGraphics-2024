@@ -1,45 +1,50 @@
-//
-// Created by wookie on 10/11/24.
-//
-#include <QAction>
-#include <QDebug>
-#include <QGraphicsSceneContextMenuEvent>
-#include <QMenu>
-
 #include "EdgeItem.h"
 #include "PolygonItem.h"
+#include "VertexItem.h"
+#include <QAction>
+#include <QGraphicsSceneContextMenuEvent>
+#include <QMenu>
+#include <QPainter>
+#include <cassert>
+
+static constexpr bool useBresenham = false;
 
 EdgeItem::EdgeItem(VertexItem *start, VertexItem *end, QGraphicsItem *parent)
     : QGraphicsItem(parent), startVertex{start}, endVertex{end}
 {
     assert(dynamic_cast<PolygonItem *>(parent) != nullptr); // Parent must be a PolygonItem
-    QGraphicsItem::setZValue(0);
+    setZValue(0);
 }
 
 QRectF EdgeItem::boundingRect() const
 {
-    return QRectF(startVertex->position, endVertex->position).normalized().adjusted(-2, -2, 2, 2);
+    QPointF startPoint = mapFromItem(startVertex, 0, 0);
+    QPointF endPoint   = mapFromItem(endVertex, 0, 0);
+    return QRectF(startPoint, endPoint).normalized().adjusted(-2, -2, 2, 2);
 }
 
 void EdgeItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *)
 {
+    QPointF startPoint = mapFromItem(startVertex, 0, 0);
+    QPointF endPoint   = mapFromItem(endVertex, 0, 0);
+
     if constexpr (useBresenham)
     {
         painter->setRenderHint(QPainter::Antialiasing, false);
         painter->setPen(QPen(Qt::black, 1));
-        bresenham(painter, startVertex->position, endVertex->position, width);
+        bresenham(painter, startPoint, endPoint, width);
     }
     else
     {
         painter->setPen(QPen(Qt::black, width));
-        painter->drawLine(startVertex->position, endVertex->position);
+        painter->drawLine(startPoint, endPoint);
     }
 
     PolygonItem *polygon = dynamic_cast<PolygonItem *>(parentItem());
     if (polygon->paintIndex)
     {
-        QPointF center = (startVertex->position + endVertex->position) / 2;
-        QString text   = QString::number(static_cast<int>(polygon->getEdgeIndex(this)));
+        QPointF center = (startPoint + endPoint) / 2;
+        QString text   = QString::number(polygon->getEdgeIndex(this));
 
         QPainterPath path;
         path.addText(center, painter->font(), text);
@@ -54,9 +59,9 @@ void EdgeItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidge
         painter->drawPath(path);
     }
 }
+
 void EdgeItem::bresenham(QPainter *painter, const QPointF &start, const QPointF &end, qreal width)
 {
-    // Bresenham's line algorithm
     int x1 = static_cast<int>(start.x());
     int y1 = static_cast<int>(start.y());
     int x2 = static_cast<int>(end.x());
@@ -72,16 +77,15 @@ void EdgeItem::bresenham(QPainter *painter, const QPointF &start, const QPointF 
 
     while (true)
     {
-        // Draw the thickness by drawing multiple points perpendicular to the line direction
         for (int i = -halfWidth; i <= halfWidth; ++i)
         {
             if (dx > dy)
             {
-                painter->drawPoint(x1, y1 + i); // Line is more horizontal, vary y to add thickness
+                painter->drawPoint(x1, y1 + i);
             }
             else
             {
-                painter->drawPoint(x1 + i, y1); // Line is more vertical, vary x to add thickness
+                painter->drawPoint(x1 + i, y1);
             }
         }
 
@@ -104,9 +108,10 @@ void EdgeItem::bresenham(QPainter *painter, const QPointF &start, const QPointF 
 
 QDataStream &operator<<(QDataStream &out, const EdgeItem &edge)
 {
-    out << "(" << edge.startVertex->position << ", " << edge.endVertex->position << ")";
+    out << "(" << edge.startVertex->pos() << ", " << edge.endVertex->pos() << ")";
     return out;
 }
+
 void EdgeItem::contextMenuEvent(QGraphicsSceneContextMenuEvent *event)
 {
     QMenu menu;

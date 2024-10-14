@@ -15,36 +15,22 @@ QRectF PolygonItem::boundingRect() const
     if (vertices.isEmpty())
         return QRectF();
 
-    qreal minX = vertices[0]->position.x(), minY = vertices[0]->position.y();
+    qreal minX = vertices[0]->pos().x(), minY = vertices[0]->pos().y();
     qreal maxX = minX, maxY = minY;
 
     for (const auto &vertex : vertices)
     {
-        QPointF pos = vertex->position;
-        if (pos.x() < minX)
-            minX = pos.x();
-        if (pos.y() < minY)
-            minY = pos.y();
-        if (pos.x() > maxX)
-            maxX = pos.x();
-        if (pos.y() > maxY)
-            maxY = pos.y();
+        QPointF pos = vertex->pos();
+        minX        = std::min(minX, pos.x());
+        minY        = std::min(minY, pos.y());
+        maxX        = std::max(maxX, pos.x());
+        maxY        = std::max(maxY, pos.y());
     }
 
-    return QRectF(QPointF(minX, minY), QPointF(maxX, maxY)).adjusted(-15, -15, 15, 15);
+    return QRectF(QPointF(minX, minY), QPointF(maxX, maxY)).adjusted(-40, -40, 40, 40);
 }
-
 void PolygonItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *qStyleOptionGraphicsItem, QWidget *qWidget)
 {
-//    for (auto edge : edges)
-//    {
-//        edge->paint(painter, qStyleOptionGraphicsItem, qWidget);
-//    }
-//
-//    for (auto vertex : vertices)
-//    {
-//        vertex->paint(painter, qStyleOptionGraphicsItem, qWidget);
-//    }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -154,12 +140,14 @@ void PolygonItem::deleteVertex(unsigned int index)
         int mergeIdx = edges.indexOf(prevEdge);
         deleteEdge(prevEdge);
         deleteEdge(nextEdge);
-        if (vertices.size() > 3) {
+        if (vertices.size() > 3)
+        {
             addEdge(mergeEdge, mergeIdx);
-        } else {
+        }
+        else
+        {
             delete mergeEdge;
         }
-
     }
 
     vertices.removeOne(vertex);
@@ -189,7 +177,7 @@ void PolygonItem::subdivideEdge(EdgeItem *edge)
     Q_ASSERT(edge->startVertex->edgeFrom == edge || edge->startVertex->edgeTo == edge);
 
     int edgeIndex = edges.indexOf(edge);
-    insertVertex(edgeIndex, (edge->startVertex->position + edge->endVertex->position) / 2.0);
+    insertVertex(edgeIndex, (edge->startVertex->pos() + edge->endVertex->pos()) / 2.0);
 
     prepareGeometryChange();
 }
@@ -221,32 +209,32 @@ void PolygonItem::deleteEdge(EdgeItem *edge)
 ////////////////////////////////////////////////////////////////////////////////
 void PolygonItem::mousePressEvent(QGraphicsSceneMouseEvent *event)
 {
-    QPointF clickPos    = event->pos();
-    selectedVertexIndex = findClosestVertex(clickPos);
-    if (selectedVertexIndex != -1)
+    // Move the entire polygon if the moveAllVertices flag is set
+    if (moveAllVertices)
     {
-        vertices[selectedVertexIndex]->setFlag(QGraphicsItem::ItemIsMovable, true);
+        this->setFlag(QGraphicsItem::ItemIsMovable, true);
+        return;
     }
 }
 
 void PolygonItem::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
 {
-    if (selectedVertexIndex != -1)
+    // Move the entire polygon if the moveAllVertices flag is set
+    if (moveAllVertices)
     {
-        vertices[selectedVertexIndex]->position = event->pos();
-        scene()->views().first()->centerOn(vertices[selectedVertexIndex]);
-        scene()->update();
+        QPointF delta = event->pos() - event->lastPos();
+        this->moveBy(delta.x(), delta.y());
+        return;
     }
 }
 
 void PolygonItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *)
 {
-    if (selectedVertexIndex != -1)
+    // Stop moving the entire polygon if the moveAllVertices flag is set
+    if (moveAllVertices)
     {
-        vertices[selectedVertexIndex]->setFlag(QGraphicsItem::ItemIsMovable, false);
-        scene()->views().first()->centerOn(vertices[selectedVertexIndex]);
+        this->setFlag(QGraphicsItem::ItemIsMovable, false);
     }
-    selectedVertexIndex = -1;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -275,14 +263,13 @@ int PolygonItem::findClosestVertex(const QPointF &pos)
 
     for (int i = 0; i < vertices.size(); ++i)
     {
-        if (QLineF(pos, vertices[i]->position).length() < tolerance)
+        if (QLineF(pos, vertices[i]->pos()).length() < tolerance)
         {
             return i;
         }
     }
     return -1;
 }
-
 /*
  * Check if the vertices are in linear order with the edges
  * (v1 -> e1 (v1,v2) -> v2 -> e2 (v2,v3) -> v3 -> e3 (v3,v1) -> v1)
@@ -397,7 +384,7 @@ void PolygonItem::printOrderingStatus(VertexItem *vertex, const QString &message
     for (int i = 0; i < vertices.size(); ++i)
     {
         VertexItem *v = vertices[i];
-        qDebug() << "Vertex" << i << ": Position:" << v->position;
+        qDebug() << "Vertex" << i << ": Position:" << v->pos();
 
         if (v->edgeFrom != nullptr)
         {
@@ -407,8 +394,8 @@ void PolygonItem::printOrderingStatus(VertexItem *vertex, const QString &message
 
             qDebug() << " EdgeFrom idx" << edges.indexOf(v->edgeFrom) << "("
                      << vertices.indexOf(v->edgeFrom->startVertex) << "," << vertices.indexOf(v->edgeFrom->endVertex)
-                     << ")" << "from position" << v->edgeFrom->startVertex->position << "to position"
-                     << v->edgeFrom->endVertex->position;
+                     << ")" << "from pos()" << v->edgeFrom->startVertex->pos() << "to pos()"
+                     << v->edgeFrom->endVertex->pos();
         }
         if (v->edgeTo != nullptr)
         {
@@ -416,14 +403,14 @@ void PolygonItem::printOrderingStatus(VertexItem *vertex, const QString &message
             Q_ASSERT(v->edgeTo->endVertex == vertices[i]);
             Q_ASSERT(edges.contains(v->edgeTo));
             qDebug() << " EdgeTo   idx" << edges.indexOf(v->edgeTo) << "(" << vertices.indexOf(v->edgeTo->startVertex)
-                     << "," << vertices.indexOf(v->edgeTo->endVertex) << ")" << "from position"
-                     << v->edgeTo->startVertex->position << "to position" << v->edgeTo->endVertex->position;
+                     << "," << vertices.indexOf(v->edgeTo->endVertex) << ")" << "from pos()"
+                     << v->edgeTo->startVertex->pos() << "to pos()" << v->edgeTo->endVertex->pos();
         }
     }
 
     if (vertex != nullptr)
     {
-        qDebug() << "Issue detected at vertex with position:" << vertex->position << "Message:" << message;
+        qDebug() << "Issue detected at vertex with pos():" << vertex->pos() << "Message:" << message;
     }
 }
 
@@ -432,16 +419,6 @@ void PolygonItem::printOrderingStatus(VertexItem *vertex, const QString &message
 ////////////////////////////////////////////////////////////////////////////////
 PolygonItem::~PolygonItem()
 {
-    for (auto vertex : vertices)
-    {
-        delete vertex;
-    }
-
-    for (auto edge : edges)
-    {
-        delete edge;
-    }
-
-    vertices.clear();
-    edges.clear();
+    qDeleteAll(vertices);
+    qDeleteAll(edges);
 }

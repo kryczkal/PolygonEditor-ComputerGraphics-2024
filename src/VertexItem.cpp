@@ -1,51 +1,45 @@
-//
-// Created by wookie on 10/11/24.
-//
-
+#include "VertexItem.h"
+#include "PolygonItem.h"
 #include <QAction>
 #include <QGraphicsSceneContextMenuEvent>
+#include <QGraphicsSceneMouseEvent>
+#include <QGraphicsView>
 #include <QMenu>
+#include <QPainter>
 
-#include "PolygonItem.h"
-#include "VertexItem.h"
+static constexpr qreal radius = 5.0;
 
-VertexItem::VertexItem(const QPointF &position, QGraphicsItem *parent) : QGraphicsItem(parent), position{position}
+VertexItem::VertexItem(const QPointF &position, QGraphicsItem *parent) : QGraphicsItem(parent)
 {
     assert(dynamic_cast<PolygonItem *>(parent) != nullptr); // Parent must be a PolygonItem
-    QGraphicsItem::setZValue(1);
+    setPos(position);
+    setZValue(1);
 }
 
-QRectF VertexItem::boundingRect() const
-{
-    return QRectF(position.x() - radius, position.y() - radius, 2 * radius, 2 * radius);
-}
+QRectF VertexItem::boundingRect() const { return QRectF(-radius, -radius, 2 * radius, 2 * radius); }
 
 void VertexItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *)
 {
     painter->setBrush(Qt::black);
-    painter->drawEllipse(position, radius, radius);
+    painter->drawEllipse(QPointF(0, 0), radius, radius);
 
-    // Paint the number of the vertex
+    // Paint the index number of the vertex
     PolygonItem *polygon = dynamic_cast<PolygonItem *>(parentItem());
     if (polygon->paintIndex)
     {
-        // Get the text to display
-        QString text = QString::number(static_cast<int>(polygon->getVertexIndex(this)));
+        QString text         = QString::number(polygon->getVertexIndex(const_cast<VertexItem *>(this)));
+        QPointF textPosition = QPointF(radius, -radius);
 
-        // Create the text position
-        QPointF textPosition = position + QPointF(radius, -radius);
-
-        // Create a QPainterPath to outline the text (for the black stroke)
         QPainterPath path;
         path.addText(textPosition, painter->font(), text);
 
-        // Draw the black stroke
+        // Draw the text outline
         QPen pen(Qt::black, 3.0);
         painter->setPen(pen);
         painter->drawPath(path);
 
         // Fill the text with white color
-        painter->setPen(Qt::NoPen); // Disable the pen for filling
+        painter->setPen(Qt::NoPen);
         painter->setBrush(Qt::white);
         painter->drawPath(path);
     }
@@ -66,9 +60,39 @@ void VertexItem::contextMenuEvent(QGraphicsSceneContextMenuEvent *event)
 
 QDataStream &operator<<(QDataStream &out, const VertexItem &vertex)
 {
-    out << vertex.position;
+    out << vertex.pos();
     return out;
 }
+
 bool VertexItem::hasBothEdges() const { return edgeFrom != nullptr && edgeTo != nullptr; }
 
 bool VertexItem::hasOneEdge() const { return (!hasBothEdges() && (edgeFrom != nullptr || edgeTo != nullptr)); }
+
+void VertexItem::mousePressEvent(QGraphicsSceneMouseEvent *event)
+{
+    PolygonItem *polygon = dynamic_cast<PolygonItem *>(parentItem());
+    if (polygon->moveAllVertices)
+        return;
+
+    setFlag(QGraphicsItem::ItemIsMovable, true);
+}
+
+void VertexItem::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
+{
+    PolygonItem *polygon = dynamic_cast<PolygonItem *>(parentItem());
+    if (polygon->moveAllVertices)
+        return;
+
+    QPointF delta = event->pos() - event->lastPos();
+    moveBy(delta.x(), delta.y());
+    prepareGeometryChange();
+    scene()->update();
+}
+
+void VertexItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
+{
+    PolygonItem *polygon = dynamic_cast<PolygonItem *>(parentItem());
+    if (polygon->moveAllVertices)
+        return;
+    setFlag(QGraphicsItem::ItemIsMovable, false);
+}

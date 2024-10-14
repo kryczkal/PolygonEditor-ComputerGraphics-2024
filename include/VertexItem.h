@@ -21,7 +21,7 @@ class EdgeItem; // Forward declaration
 class VertexItem : public QGraphicsItem
 {
     public:
-    VertexItem(const QPointF &position, QGraphicsItem *parent = nullptr);
+    explicit VertexItem(const QPointF &position, QGraphicsItem *parent = nullptr);
 
     [[nodiscard]] QRectF boundingRect() const override;
 
@@ -34,8 +34,12 @@ class VertexItem : public QGraphicsItem
     bool hasBothEdges() const;
     bool hasOneEdge() const;
 
-    QPointF position;
     qreal radius = 5.0;
+
+    protected:
+    void mousePressEvent(QGraphicsSceneMouseEvent *event) override;
+    void mouseMoveEvent(QGraphicsSceneMouseEvent *event) override;
+    void mouseReleaseEvent(QGraphicsSceneMouseEvent *event) override;
 
     private:
     void contextMenuEvent(QGraphicsSceneContextMenuEvent *event) override;

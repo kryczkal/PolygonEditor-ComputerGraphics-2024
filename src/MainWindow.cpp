@@ -18,14 +18,6 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
     QToolBar *topToolBar = new QToolBar("Top Toolbar", this);
     addToolBar(Qt::TopToolBarArea, topToolBar);
 
-    QAction *action1 = new QAction(QIcon("assets/icons/icon1.png"), "Action 1", this);
-    QAction *action2 = new QAction(QIcon("assets/icons/icon2.png"), "Action 2", this);
-    QAction *action3 = new QAction(QIcon("assets/icons/icon3.png"), "Action 3", this);
-
-    topToolBar->addAction(action1);
-    topToolBar->addAction(action2);
-    topToolBar->addAction(action3);
-
     // Create the left custom toolbar (25% of the width or fixed 500px)
     QWidget *leftToolBar = new QWidget(this);
     leftToolBar->setMaximumWidth(350);
@@ -34,10 +26,12 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
     QPushButton *button1    = new QPushButton("Delete Polygon", leftToolBar);
     QPushButton *button2    = new QPushButton("Add Vertex", leftToolBar);
     QPushButton *button3    = new QPushButton("Toggle index visibility", leftToolBar);
+    QPushButton *button4    = new QPushButton("Toggle move all", leftToolBar);
 
     leftLayout->addWidget(button1);
     leftLayout->addWidget(button2);
     leftLayout->addWidget(button3);
+    leftLayout->addWidget(button4);
     leftLayout->addStretch();
 
     // Create canvas to the right using QGraphicsView
@@ -64,6 +58,8 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
     // Connect button to the handler
     connect(button1, &QPushButton::clicked, this, &MainWindow::DeletePolygon);
     connect(button2, &QPushButton::clicked, this, &MainWindow::AddVertex);
+    connect(button3, &QPushButton::clicked, this, &MainWindow::ToggleIndexVisibility);
+    connect(button4, &QPushButton::clicked, this, &MainWindow::ToggleMoveAllVertices);
 }
 
 MainWindow::~MainWindow() {}
@@ -79,5 +75,17 @@ void MainWindow::AddVertex()
 {
     QPointF position = QPointF(rand() % 500, rand() % 500);
     polygonItem->appendVertex(position);
+    scene->update();
+}
+
+void MainWindow::ToggleIndexVisibility()
+{
+    polygonItem->toggleIndexVisibility();
+    scene->update();
+}
+
+void MainWindow::ToggleMoveAllVertices()
+{
+    polygonItem->toggleMoveAllVertices();
     scene->update();
 }
