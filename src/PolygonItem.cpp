@@ -36,15 +36,15 @@ QRectF PolygonItem::boundingRect() const
 
 void PolygonItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *qStyleOptionGraphicsItem, QWidget *qWidget)
 {
-    for (auto edge : edges)
-    {
-        edge->paint(painter, qStyleOptionGraphicsItem, qWidget);
-    }
-
-    for (auto vertex : vertices)
-    {
-        vertex->paint(painter, qStyleOptionGraphicsItem, qWidget);
-    }
+//    for (auto edge : edges)
+//    {
+//        edge->paint(painter, qStyleOptionGraphicsItem, qWidget);
+//    }
+//
+//    for (auto vertex : vertices)
+//    {
+//        vertex->paint(painter, qStyleOptionGraphicsItem, qWidget);
+//    }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -125,6 +125,7 @@ void PolygonItem::insertVertex(unsigned int index, const QPointF &position)
     assert(checkLinearOrdering());
 }
 
+// TODO: bugged for 3 vertices (preserves edge (1, 0), should reorder it to be (0, 1))
 void PolygonItem::deleteVertex(unsigned int index)
 {
     if (index >= vertices.size())
@@ -153,8 +154,12 @@ void PolygonItem::deleteVertex(unsigned int index)
         int mergeIdx = edges.indexOf(prevEdge);
         deleteEdge(prevEdge);
         deleteEdge(nextEdge);
-        if (vertices.size() > 3)
+        if (vertices.size() > 3) {
             addEdge(mergeEdge, mergeIdx);
+        } else {
+            delete mergeEdge;
+        }
+
     }
 
     vertices.removeOne(vertex);
