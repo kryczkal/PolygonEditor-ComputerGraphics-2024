@@ -31,6 +31,8 @@ class PolygonItem : public QGraphicsItem
     void toggleIndexVisibility();
     void toggleMoveAllVertices();
 
+    void applyConstraints(EdgeItem *edge);
+
     bool paintIndex      = true;
     bool moveAllVertices = false;
 
@@ -54,6 +56,7 @@ class PolygonItem : public QGraphicsItem
 
     FRIEND_TEST(PolygonItemTest, CheckLinearOrdering);
     void printOrderingStatus(VertexItem *vertex, const QString &message) const;
+
 };
 
 #endif // POLYGONEDITOR_POLYGONITEM_H

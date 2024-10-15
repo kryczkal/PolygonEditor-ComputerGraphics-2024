@@ -89,22 +89,7 @@ void VertexItem::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
     QPointF delta = event->pos() - event->lastPos();
     moveBy(delta.x(), delta.y());
 
-    bool flipDirection = false;
-    bool canMove       = true;
-    if (edgeIn && edgeIn->getConstraint())
-        flipDirection = true;
-    if (flipDirection && edgeOut && edgeOut->getConstraint())
-        canMove = false;
-
-    if (canMove && !flipDirection)
-        ConstraintChecker::runApply(edgeOut, edgeOut);
-    else if (canMove)
-        ConstraintChecker::runApply(edgeIn, edgeIn, SearchDirection::Backward);
-    else
-    {
-        polygon->moveBy(delta.x(), delta.y());
-        moveBy(-delta.x(), -delta.y());
-    }
+    polygon->applyConstraints(edgeOut);
 
     prepareGeometryChange();
     scene()->update();

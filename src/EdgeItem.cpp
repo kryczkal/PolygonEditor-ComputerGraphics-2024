@@ -156,7 +156,7 @@ void EdgeItem::contextMenuEvent(QGraphicsSceneContextMenuEvent *event)
             [this]
             {
                 constraint = new HorizontalEdgeConstraint();
-                ConstraintChecker::runApply(this, this);
+                dynamic_cast<PolygonItem *>(parentItem())->applyConstraints(this);
                 scene()->update();
             }
         );
@@ -166,7 +166,7 @@ void EdgeItem::contextMenuEvent(QGraphicsSceneContextMenuEvent *event)
             [this]
             {
                 constraint = new VerticalEdgeConstraint();
-                ConstraintChecker::runApply(this, this);
+                dynamic_cast<PolygonItem *>(parentItem())->applyConstraints(this);
                 scene()->update();
             }
         );
@@ -176,7 +176,7 @@ void EdgeItem::contextMenuEvent(QGraphicsSceneContextMenuEvent *event)
             [&]
             {
                 constraint = new LengthEdgeConstraint(QLineF(startVertex->pos(), endVertex->pos()).length());
-                ConstraintChecker::runApply(this, this);
+                dynamic_cast<PolygonItem *>(parentItem())->applyConstraints(this);
                 scene()->update();
             }
         );
