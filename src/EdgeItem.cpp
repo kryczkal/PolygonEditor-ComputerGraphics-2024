@@ -8,6 +8,7 @@
 #include <QAction>
 #include <QGraphicsScene>
 #include <QGraphicsSceneContextMenuEvent>
+#include <QInputDialog>
 #include <QMenu>
 #include <QObject>
 #include <QPainter>
@@ -182,9 +183,25 @@ void EdgeItem::contextMenuEvent(QGraphicsSceneContextMenuEvent *event)
             setLengthConstraintAction, &QAction::triggered,
             [&]
             {
-                constraint = new LengthEdgeConstraint(QLineF(startVertex->pos(), endVertex->pos()).length());
-                dynamic_cast<PolygonItem *>(parentItem())->applyConstraints(this);
-                scene()->update();
+                QInputDialog dialog;
+                dialog.setLabelText("Length:");
+                dialog.setDoubleMinimum(0);
+                dialog.setDoubleMaximum(std::numeric_limits<double>::max());
+                dialog.setDoubleValue(QLineF(startVertex->pos(), endVertex->pos()).length());
+                QIODevice::connect(
+                    &dialog, &QInputDialog::accepted,
+                    [&]()
+                    {
+                        double length = dialog.doubleValue();
+                        if (length <= 0)
+                            return;
+                        constraint = new LengthEdgeConstraint(length);
+                        dynamic_cast<PolygonItem*>(parentItem())->applyConstraints(this);
+                        ConstraintChecker::runApply(this, this);
+                        scene()->update();
+                    }
+                );
+                dialog.exec();
             }
         );
     }

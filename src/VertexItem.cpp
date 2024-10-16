@@ -30,7 +30,7 @@ void VertexItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWid
     PolygonItem *polygon = dynamic_cast<PolygonItem *>(parentItem());
     if (polygon->paintIndex)
     {
-        QString text         = QString::number(polygon->getVertexIndex(const_cast<VertexItem *>(this)));
+        QString text         = QString::number(polygon->getVertexIndex(this));
         QPointF textPosition = QPointF(radius, -radius);
 
         QPainterPath path;
