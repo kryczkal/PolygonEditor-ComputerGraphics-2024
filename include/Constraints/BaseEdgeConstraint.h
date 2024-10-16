@@ -4,6 +4,7 @@
 
 #ifndef POLYGONEDITOR_BASEEDGECONSTRAINT_H
 #define POLYGONEDITOR_BASEEDGECONSTRAINT_H
+#include <QPainter>
 
 class EdgeItem;
 enum class SearchDirection;
@@ -21,7 +22,8 @@ class BaseEdgeConstraint
      * @param direction - direction of the search and correction
      * @return void
      */
-    virtual void apply(EdgeItem *edge, SearchDirection direction) = 0;
+    virtual void apply(EdgeItem *edge, SearchDirection direction)    = 0;
+    virtual void paintIcon(QPainter *painter, const QPointF &center) = 0;
 };
 
 #endif // POLYGONEDITOR_BASEEDGECONSTRAINT_H

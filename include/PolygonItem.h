@@ -35,6 +35,7 @@ class PolygonItem : public QGraphicsItem
 
     bool paintIndex      = true;
     bool moveAllVertices = false;
+    bool useBresenham    = true;
 
     ~PolygonItem();
 
@@ -56,7 +57,6 @@ class PolygonItem : public QGraphicsItem
 
     FRIEND_TEST(PolygonItemTest, CheckLinearOrdering);
     void printOrderingStatus(VertexItem *vertex, const QString &message) const;
-
 };
 
 #endif // POLYGONEDITOR_POLYGONITEM_H

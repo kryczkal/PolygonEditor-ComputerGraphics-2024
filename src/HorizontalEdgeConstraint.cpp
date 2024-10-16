@@ -30,3 +30,13 @@ void HorizontalEdgeConstraint::apply(EdgeItem *edge, SearchDirection direction)
         edge->getStartVertex()->setY(edge->getEndVertex()->y());
     }
 }
+
+void HorizontalEdgeConstraint::paintIcon(QPainter *painter, const QPointF &center)
+{
+    painter->setPen(QColor(0, 255, 0));
+    QFont font = painter->font();
+    font.setPointSize(20);
+    font.setBold(true);
+    painter->setFont(font);
+    painter->drawText(center, "H");
+}

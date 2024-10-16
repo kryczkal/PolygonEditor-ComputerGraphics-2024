@@ -3,9 +3,9 @@
 #include <QGraphicsView>
 #include <iostream>
 
+#include "Constraints/ConstraintChecker.h"
 #include "EdgeItem.h"
 #include "PolygonItem.h"
-#include "Constraints/ConstraintChecker.h"
 
 PolygonItem::PolygonItem() : selectedVertexIndex(-1) {}
 
@@ -435,9 +435,7 @@ PolygonItem::~PolygonItem()
 void PolygonItem::applyConstraints(EdgeItem *edge)
 {
     Q_ASSERT(edge != nullptr);
-    EdgeItem* oppositeEdge = edges[(edges.indexOf(edge) + edges.size()/2) % edges.size()];
-    assert(oppositeEdge != nullptr);
 
-    ConstraintChecker::runApply(edge, oppositeEdge->endVertex->edgeOut, SearchDirection::Forward);
-    ConstraintChecker::runApply(edge, oppositeEdge, SearchDirection::Backward);
+    ConstraintChecker::runApply(edge, edge->getStartVertex()->edgeIn, SearchDirection::Forward);
+    ConstraintChecker::runApply(edge, edge->getEndVertex()->edgeOut, SearchDirection::Backward);
 }

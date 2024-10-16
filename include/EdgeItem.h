@@ -27,7 +27,8 @@ class EdgeItem : public QGraphicsItem
     EdgeItem(VertexItem *start, VertexItem *end, QGraphicsItem *parent = nullptr);
 
     [[nodiscard]] QRectF boundingRect() const override;
-
+    static void paintIndex(QPainter *painter, QPointF startPoint, QPointF endPoint, int edgeIndex);
+    void drawLine(QPainter *painter, QPointF startPoint, QPointF endPoint, bool useBresenham);
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
 
     VertexItem *getStartVertex() const;

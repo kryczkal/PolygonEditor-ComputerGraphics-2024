@@ -13,8 +13,6 @@
 #include <QPainter>
 #include <cassert>
 
-static constexpr bool useBresenham = false;
-
 EdgeItem::EdgeItem(VertexItem *start, VertexItem *end, QGraphicsItem *parent)
     : QGraphicsItem(parent), startVertex{start}, endVertex{end}
 {
@@ -29,12 +27,27 @@ QRectF EdgeItem::boundingRect() const
     return QRectF(startPoint, endPoint).normalized().adjusted(-2, -2, 2, 2);
 }
 
-void EdgeItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *)
+void EdgeItem::paintIndex(QPainter *painter, QPointF startPoint, QPointF endPoint, int edgeIndex)
 {
-    QPointF startPoint = mapFromItem(startVertex, 0, 0);
-    QPointF endPoint   = mapFromItem(endVertex, 0, 0);
+    QPointF center = (startPoint + endPoint) / 2;
+    QString text   = QString::number(edgeIndex);
 
-    if constexpr (useBresenham)
+    QPainterPath path;
+    path.addText(center, painter->font(), text);
+
+    QPen pen(Qt::black, 3.0);
+    painter->setPen(pen);
+    painter->setBrush(Qt::NoBrush);
+    painter->drawPath(path);
+
+    painter->setPen(Qt::NoPen);
+    painter->setBrush(Qt::white);
+    painter->drawPath(path);
+}
+
+void EdgeItem::drawLine(QPainter *painter, QPointF startPoint, QPointF endPoint, bool useBresenham)
+{
+    if (useBresenham)
     {
         painter->setRenderHint(QPainter::Antialiasing, false);
         painter->setPen(QPen(Qt::black, 1));
@@ -45,25 +58,19 @@ void EdgeItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidge
         painter->setPen(QPen(Qt::black, width));
         painter->drawLine(startPoint, endPoint);
     }
+}
+
+void EdgeItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *)
+{
+    QPointF startPoint = mapFromItem(startVertex, 0, 0);
+    QPointF endPoint   = mapFromItem(endVertex, 0, 0);
 
     PolygonItem *polygon = dynamic_cast<PolygonItem *>(parentItem());
+    drawLine(painter, startPoint, endPoint, polygon->useBresenham);
     if (polygon->paintIndex)
-    {
-        QPointF center = (startPoint + endPoint) / 2;
-        QString text   = QString::number(polygon->getEdgeIndex(this));
-
-        QPainterPath path;
-        path.addText(center, painter->font(), text);
-
-        QPen pen(Qt::black, 3.0);
-        painter->setPen(pen);
-        painter->setBrush(Qt::NoBrush);
-        painter->drawPath(path);
-
-        painter->setPen(Qt::NoPen);
-        painter->setBrush(Qt::white);
-        painter->drawPath(path);
-    }
+        paintIndex(painter, startPoint, endPoint, polygon->getEdgeIndex(this));
+    if (constraint)
+        constraint->paintIcon(painter, (startPoint + endPoint) / 2);
 }
 
 void EdgeItem::bresenham(QPainter *painter, const QPointF &start, const QPointF &end, qreal width)

@@ -29,3 +29,13 @@ void VerticalEdgeConstraint::apply(EdgeItem *edge, SearchDirection direction)
         edge->getStartVertex()->setX(edge->getEndVertex()->x());
     }
 }
+
+void VerticalEdgeConstraint::paintIcon(QPainter *painter, const QPointF &center)
+{
+    painter->setPen(QColor(0, 0, 255));
+    QFont font = painter->font();
+    font.setPointSize(20);
+    font.setBold(true);
+    painter->setFont(font);
+    painter->drawText(center, "V");
+}
