@@ -196,7 +196,7 @@ void EdgeItem::contextMenuEvent(QGraphicsSceneContextMenuEvent *event)
                         if (length <= 0)
                             return;
                         constraint = new LengthEdgeConstraint(length);
-                        dynamic_cast<PolygonItem*>(parentItem())->applyConstraints(this);
+                        dynamic_cast<PolygonItem *>(parentItem())->applyConstraints(this);
                         ConstraintChecker::runApply(this, this);
                         scene()->update();
                     }
