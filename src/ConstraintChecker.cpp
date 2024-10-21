@@ -4,10 +4,10 @@
 
 #include "Constraints/ConstraintChecker.h"
 #include "Constraints/BaseEdgeConstraint.h"
-#include "EdgeItem.h"
+#include "Edge/EdgeItemNormal.h"
 #include "VertexItem.h"
 
-bool ConstraintChecker::runCheck(EdgeItem *edge, EdgeItem *stopEdge, SearchDirection direction)
+bool ConstraintChecker::runCheck(EdgeItemNormal *edge, EdgeItemNormal *stopEdge, SearchDirection direction)
 {
     if (edge == nullptr)
     {
@@ -23,7 +23,7 @@ bool ConstraintChecker::runCheck(EdgeItem *edge, EdgeItem *stopEdge, SearchDirec
     return runCheckInternal(getNextEdge(edge, direction), stopEdge, direction);
 }
 
-void ConstraintChecker::runApply(EdgeItem *edge, EdgeItem *stopEdge, SearchDirection direction)
+void ConstraintChecker::runApply(EdgeItemNormal *edge, EdgeItemNormal *stopEdge, SearchDirection direction)
 {
     if (edge == nullptr)
     {
@@ -39,7 +39,7 @@ void ConstraintChecker::runApply(EdgeItem *edge, EdgeItem *stopEdge, SearchDirec
     runApplyInternal(getNextEdge(edge, direction), stopEdge, direction);
 }
 
-bool ConstraintChecker::runCheckInternal(EdgeItem *edge, EdgeItem *stopEdge, SearchDirection direction)
+bool ConstraintChecker::runCheckInternal(EdgeItemNormal *edge, EdgeItemNormal *stopEdge, SearchDirection direction)
 {
     if (edge == nullptr || edge == stopEdge)
     {
@@ -55,7 +55,7 @@ bool ConstraintChecker::runCheckInternal(EdgeItem *edge, EdgeItem *stopEdge, Sea
     return runCheckInternal(getNextEdge(edge, direction), stopEdge, direction);
 }
 
-void ConstraintChecker::runApplyInternal(EdgeItem *edge, EdgeItem *stopEdge, SearchDirection direction)
+void ConstraintChecker::runApplyInternal(EdgeItemNormal *edge, EdgeItemNormal *stopEdge, SearchDirection direction)
 {
     if (edge == nullptr || edge == stopEdge)
     {
@@ -71,7 +71,7 @@ void ConstraintChecker::runApplyInternal(EdgeItem *edge, EdgeItem *stopEdge, Sea
     runApplyInternal(getNextEdge(edge, direction), stopEdge, direction);
 }
 
-EdgeItem *ConstraintChecker::getNextEdge(EdgeItem *edge, SearchDirection direction)
+EdgeItemNormal *ConstraintChecker::getNextEdge(EdgeItemNormal *edge, SearchDirection direction)
 {
     return direction == SearchDirection::Forward ? edge->getEndVertex()->edgeOut : edge->getStartVertex()->edgeIn;
 }

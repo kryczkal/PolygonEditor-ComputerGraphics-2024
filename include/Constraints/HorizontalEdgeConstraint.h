@@ -10,9 +10,9 @@ enum class SearchDirection;
 class HorizontalEdgeConstraint : public BaseEdgeConstraint
 {
     public:
-    bool check(EdgeItem *edge, SearchDirection direction) override;
-    void apply(EdgeItem *edge, SearchDirection direction) override;
-    void paintIcon(QPainter *painter, const QPointF &center) override;
+    bool check(EdgeItemNormal *edge, SearchDirection direction) override;
+    void apply(EdgeItemNormal *edge, SearchDirection direction) override;
+    void paintIcon(QPainter *painter, const QPointF &center, const EdgeItemNormal *) override;
 };
 
 #endif // POLYGONEDITOR_HORIZONTALEDGECONSTRAINT_H

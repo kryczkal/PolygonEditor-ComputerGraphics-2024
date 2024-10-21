@@ -1,6 +1,6 @@
 #include "VertexItem.h"
 #include "Constraints/ConstraintChecker.h"
-#include "EdgeItem.h"
+#include "Edge/EdgeItemNormal.h"
 #include "PolygonItem.h"
 #include <QAction>
 #include <QGraphicsSceneContextMenuEvent>
@@ -14,7 +14,7 @@ static constexpr qreal radius = 5.0;
 
 VertexItem::VertexItem(const QPointF &position, QGraphicsItem *parent) : QGraphicsItem(parent)
 {
-    assert(dynamic_cast<PolygonItem *>(parent) != nullptr); // Parent must be a PolygonItem
+    Q_ASSERT(dynamic_cast<PolygonItem *>(parent) != nullptr); // Parent must be a PolygonItem
     setPos(position);
     setZValue(1);
 }

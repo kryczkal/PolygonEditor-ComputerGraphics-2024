@@ -7,7 +7,7 @@
 #include <QPainter>
 #include <gtest/gtest.h>
 
-class EdgeItem;
+class EdgeItemNormal;
 
 class PolygonItem : public QGraphicsItem
 {
@@ -24,14 +24,14 @@ class PolygonItem : public QGraphicsItem
     void deleteVertex(VertexItem *vertex);
 
     void subdivideEdge(unsigned int index);
-    void subdivideEdge(EdgeItem *edge);
+    void subdivideEdge(EdgeItemNormal *edge);
 
     int getVertexIndex(VertexItem *vertex) const;
-    int getEdgeIndex(EdgeItem *edge) const;
+    int getEdgeIndex(EdgeItemNormal *edge) const;
     void toggleIndexVisibility();
     void toggleMoveAllVertices();
 
-    void applyConstraints(EdgeItem *edge);
+    void applyConstraints(EdgeItemNormal *edge);
 
     bool paintIndex      = true;
     bool moveAllVertices = false;
@@ -45,14 +45,14 @@ class PolygonItem : public QGraphicsItem
     void mouseReleaseEvent(QGraphicsSceneMouseEvent *event) override;
 
     private:
-    void addEdge(EdgeItem *edge, unsigned int idx = -1);
-    void deleteEdge(EdgeItem *edge);
+    void addEdge(EdgeItemNormal *edge, unsigned int idx = -1);
+    void deleteEdge(EdgeItemNormal *edge);
     int findClosestVertex(const QPointF &pos);
 
     bool checkLinearOrdering();
 
     QList<VertexItem *> vertices;
-    QList<EdgeItem *> edges;
+    QList<EdgeItemNormal *> edges;
     int selectedVertexIndex;
 
     FRIEND_TEST(PolygonItemTest, CheckLinearOrdering);

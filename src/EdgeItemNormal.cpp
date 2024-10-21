@@ -1,34 +1,33 @@
-#include "EdgeItem.h"
+#include "Edge/EdgeItemNormal.h"
 #include "Constraints/ConstraintChecker.h"
 #include "Constraints/HorizontalEdgeConstraint.h"
 #include "Constraints/LengthEdgeConstraint.h"
 #include "Constraints/VerticalEdgeConstraint.h"
+#include "Edge/EdgeItemBase.h"
 #include "PolygonItem.h"
 #include "VertexItem.h"
 #include <QAction>
+#include <QDebug>
 #include <QGraphicsScene>
 #include <QGraphicsSceneContextMenuEvent>
 #include <QInputDialog>
 #include <QMenu>
 #include <QObject>
 #include <QPainter>
-#include <cassert>
 
-EdgeItem::EdgeItem(VertexItem *start, VertexItem *end, QGraphicsItem *parent)
-    : QGraphicsItem(parent), startVertex{start}, endVertex{end}
+EdgeItemNormal::EdgeItemNormal(VertexItem *start, VertexItem *end, QGraphicsItem *parent)
+    : EdgeItemBase(start, end, parent)
 {
-    assert(dynamic_cast<PolygonItem *>(parent) != nullptr); // Parent must be a PolygonItem
-    setZValue(0);
 }
 
-QRectF EdgeItem::boundingRect() const
+QRectF EdgeItemNormal::boundingRect() const
 {
     QPointF startPoint = mapFromItem(startVertex, 0, 0);
     QPointF endPoint   = mapFromItem(endVertex, 0, 0);
     return QRectF(startPoint, endPoint).normalized().adjusted(-2, -2, 2, 2);
 }
 
-void EdgeItem::paintIndex(QPainter *painter, QPointF startPoint, QPointF endPoint, int edgeIndex)
+void EdgeItemNormal::paintIndex(QPainter *painter, QPointF startPoint, QPointF endPoint, int edgeIndex)
 {
     QPointF center = (startPoint + endPoint) / 2;
     QString text   = QString::number(edgeIndex);
@@ -46,7 +45,20 @@ void EdgeItem::paintIndex(QPainter *painter, QPointF startPoint, QPointF endPoin
     painter->drawPath(path);
 }
 
-void EdgeItem::drawLine(QPainter *painter, QPointF startPoint, QPointF endPoint, bool useBresenham)
+void EdgeItemNormal::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *)
+{
+    QPointF startPoint = mapFromItem(startVertex, 0, 0);
+    QPointF endPoint   = mapFromItem(endVertex, 0, 0);
+
+    PolygonItem *polygon = dynamic_cast<PolygonItem *>(parentItem());
+    drawLine(painter, startPoint, endPoint, polygon->useBresenham);
+    if (polygon->paintIndex)
+        paintIndex(painter, startPoint, endPoint, polygon->getEdgeIndex(this));
+    if (edgeConstraint)
+        edgeConstraint->paintIcon(painter, (startPoint + endPoint) / 2, this);
+}
+
+void EdgeItemNormal::drawLine(QPainter *painter, QPointF startPoint, QPointF endPoint, bool useBresenham)
 {
     if (useBresenham)
     {
@@ -61,20 +73,7 @@ void EdgeItem::drawLine(QPainter *painter, QPointF startPoint, QPointF endPoint,
     }
 }
 
-void EdgeItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *)
-{
-    QPointF startPoint = mapFromItem(startVertex, 0, 0);
-    QPointF endPoint   = mapFromItem(endVertex, 0, 0);
-
-    PolygonItem *polygon = dynamic_cast<PolygonItem *>(parentItem());
-    drawLine(painter, startPoint, endPoint, polygon->useBresenham);
-    if (polygon->paintIndex)
-        paintIndex(painter, startPoint, endPoint, polygon->getEdgeIndex(this));
-    if (constraint)
-        constraint->paintIcon(painter, (startPoint + endPoint) / 2);
-}
-
-void EdgeItem::bresenham(QPainter *painter, const QPointF &start, const QPointF &end, qreal width)
+void EdgeItemNormal::bresenham(QPainter *painter, const QPointF &start, const QPointF &end, qreal width)
 {
     int x1 = static_cast<int>(start.x());
     int y1 = static_cast<int>(start.y());
@@ -120,13 +119,13 @@ void EdgeItem::bresenham(QPainter *painter, const QPointF &start, const QPointF 
     }
 }
 
-QDataStream &operator<<(QDataStream &out, const EdgeItem &edge)
+QDataStream &operator<<(QDataStream &out, const EdgeItemNormal &edge)
 {
     out << "(" << edge.startVertex->pos() << ", " << edge.endVertex->pos() << ")";
     return out;
 }
 
-void EdgeItem::contextMenuEvent(QGraphicsSceneContextMenuEvent *event)
+void EdgeItemNormal::contextMenuEvent(QGraphicsSceneContextMenuEvent *event)
 {
     QMenu menu;
     QAction *subdivideAction = menu.addAction("Subdivide");
@@ -144,15 +143,15 @@ void EdgeItem::contextMenuEvent(QGraphicsSceneContextMenuEvent *event)
     QAction *setLengthConstraintAction;
     QAction *removeConstraintAction;
 
-    if (constraint)
+    if (edgeConstraint)
     {
         removeConstraintAction = menu.addAction("Remove Constraint");
         QIODevice::connect(
             removeConstraintAction, &QAction::triggered,
             [this]
             {
-                delete constraint;
-                constraint = nullptr;
+                delete edgeConstraint;
+                edgeConstraint = nullptr;
             }
         );
     }
@@ -163,7 +162,7 @@ void EdgeItem::contextMenuEvent(QGraphicsSceneContextMenuEvent *event)
             setHorizontalConstraintAction, &QAction::triggered,
             [this]
             {
-                constraint = new HorizontalEdgeConstraint();
+                edgeConstraint = new HorizontalEdgeConstraint();
                 dynamic_cast<PolygonItem *>(parentItem())->applyConstraints(this);
                 scene()->update();
             }
@@ -173,7 +172,7 @@ void EdgeItem::contextMenuEvent(QGraphicsSceneContextMenuEvent *event)
             setVerticalConstraintAction, &QAction::triggered,
             [this]
             {
-                constraint = new VerticalEdgeConstraint();
+                edgeConstraint = new VerticalEdgeConstraint();
                 dynamic_cast<PolygonItem *>(parentItem())->applyConstraints(this);
                 scene()->update();
             }
@@ -195,7 +194,7 @@ void EdgeItem::contextMenuEvent(QGraphicsSceneContextMenuEvent *event)
                         double length = dialog.doubleValue();
                         if (length <= 0)
                             return;
-                        constraint = new LengthEdgeConstraint(length);
+                        edgeConstraint = new LengthEdgeConstraint(length);
                         dynamic_cast<PolygonItem *>(parentItem())->applyConstraints(this);
                         ConstraintChecker::runApply(this, this);
                         scene()->update();
@@ -209,12 +208,11 @@ void EdgeItem::contextMenuEvent(QGraphicsSceneContextMenuEvent *event)
     menu.exec(event->screenPos());
 }
 
-BaseEdgeConstraint *EdgeItem::getConstraint() const { return constraint; }
+BaseEdgeConstraint *EdgeItemNormal::getConstraint() const { return edgeConstraint; }
 
-void EdgeItem::setConstraint(BaseEdgeConstraint *constraint) { EdgeItem::constraint = constraint; }
+[[maybe_unused]] void EdgeItemNormal::setConstraint(BaseEdgeConstraint *edgeConstraint)
+{
+    EdgeItemNormal::edgeConstraint = edgeConstraint;
+}
 
-VertexItem *EdgeItem::getStartVertex() const { return startVertex; }
-
-VertexItem *EdgeItem::getEndVertex() const { return endVertex; }
-
-EdgeItem::~EdgeItem() { delete constraint; }
+EdgeItemNormal::~EdgeItemNormal() { delete edgeConstraint; }

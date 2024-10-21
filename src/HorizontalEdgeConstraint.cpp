@@ -4,10 +4,10 @@
 
 #include "Constraints/HorizontalEdgeConstraint.h"
 #include "Constraints/ConstraintChecker.h"
-#include "EdgeItem.h"
+#include "Edge/EdgeItemNormal.h"
 #include "VertexItem.h"
 
-bool HorizontalEdgeConstraint::check(EdgeItem *edge, SearchDirection direction)
+bool HorizontalEdgeConstraint::check(EdgeItemNormal *edge, SearchDirection direction)
 {
     if (direction == SearchDirection::Forward)
     {
@@ -19,7 +19,7 @@ bool HorizontalEdgeConstraint::check(EdgeItem *edge, SearchDirection direction)
     }
 }
 
-void HorizontalEdgeConstraint::apply(EdgeItem *edge, SearchDirection direction)
+void HorizontalEdgeConstraint::apply(EdgeItemNormal *edge, SearchDirection direction)
 {
     if (direction == SearchDirection::Forward)
     {
@@ -31,7 +31,7 @@ void HorizontalEdgeConstraint::apply(EdgeItem *edge, SearchDirection direction)
     }
 }
 
-void HorizontalEdgeConstraint::paintIcon(QPainter *painter, const QPointF &center)
+void HorizontalEdgeConstraint::paintIcon(QPainter *painter, const QPointF &center, const EdgeItemNormal *)
 {
     painter->setPen(QColor(0, 255, 0));
     QFont font = painter->font();

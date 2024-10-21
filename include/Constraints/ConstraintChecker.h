@@ -5,7 +5,7 @@
 #ifndef POLYGONEDITOR_CONSTRAINTCHECKER_H
 #define POLYGONEDITOR_CONSTRAINTCHECKER_H
 
-class EdgeItem;
+class EdgeItemNormal;
 
 enum class SearchDirection
 {
@@ -23,19 +23,21 @@ class ConstraintChecker
      * @param direction - direction of the search
      * @return true if all constraints are met, false otherwise
      */
-    static bool runCheck(EdgeItem *edge, EdgeItem *stopEdge, SearchDirection direction = SearchDirection::Forward);
+    static bool
+    runCheck(EdgeItemNormal *edge, EdgeItemNormal *stopEdge, SearchDirection direction = SearchDirection::Forward);
     /*
      * Best effort to apply constraints to all edges starting from edge to stopEdge
      * @param edge - edge to start applying from
      * @param stopEdge - edge to stop applying at
      * @param direction - direction of the search and constraints application
      */
-    static void runApply(EdgeItem *edge, EdgeItem *stopEdge, SearchDirection direction = SearchDirection::Forward);
+    static void
+    runApply(EdgeItemNormal *edge, EdgeItemNormal *stopEdge, SearchDirection direction = SearchDirection::Forward);
 
     private:
-    static bool runCheckInternal(EdgeItem *edge, EdgeItem *stopEdge, SearchDirection direction);
-    static void runApplyInternal(EdgeItem *edge, EdgeItem *stopEdge, SearchDirection direction);
-    static EdgeItem *getNextEdge(EdgeItem *edge, SearchDirection direction);
+    static bool runCheckInternal(EdgeItemNormal *edge, EdgeItemNormal *stopEdge, SearchDirection direction);
+    static void runApplyInternal(EdgeItemNormal *edge, EdgeItemNormal *stopEdge, SearchDirection direction);
+    static EdgeItemNormal *getNextEdge(EdgeItemNormal *edge, SearchDirection direction);
 };
 
 #endif // POLYGONEDITOR_CONSTRAINTCHECKER_H

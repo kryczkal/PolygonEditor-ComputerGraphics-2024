@@ -10,7 +10,7 @@
 #include <QPainter>
 #include <gtest/gtest.h>
 
-class EdgeItem;
+class EdgeItemNormal;
 /*
  * @brief Class representing a vertex in the polygon
  * @details The class is responsible for drawing the vertex on the scene and handling the context menu
@@ -26,8 +26,8 @@ class VertexItem : public QGraphicsItem
 
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
 
-    EdgeItem *edgeOut = nullptr;
-    EdgeItem *edgeIn  = nullptr;
+    EdgeItemNormal *edgeOut = nullptr;
+    EdgeItemNormal *edgeIn  = nullptr;
 
     [[nodiscard]]
     bool hasBothEdges() const;

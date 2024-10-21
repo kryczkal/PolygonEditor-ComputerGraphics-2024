@@ -4,10 +4,10 @@
 
 #include "Constraints/LengthEdgeConstraint.h"
 #include "Constraints/ConstraintChecker.h"
-#include "EdgeItem.h"
+#include "Edge/EdgeItemNormal.h"
 #include "VertexItem.h"
 
-bool LengthEdgeConstraint::check(EdgeItem *edge, SearchDirection direction)
+bool LengthEdgeConstraint::check(EdgeItemNormal *edge, SearchDirection direction)
 {
     if (direction == SearchDirection::Forward)
     {
@@ -19,7 +19,7 @@ bool LengthEdgeConstraint::check(EdgeItem *edge, SearchDirection direction)
     }
 }
 
-void LengthEdgeConstraint::apply(EdgeItem *edge, SearchDirection direction)
+void LengthEdgeConstraint::apply(EdgeItemNormal *edge, SearchDirection direction)
 {
     if (direction == SearchDirection::Forward)
     {
@@ -35,12 +35,14 @@ void LengthEdgeConstraint::apply(EdgeItem *edge, SearchDirection direction)
     }
 }
 
-void LengthEdgeConstraint::paintIcon(QPainter *painter, const QPointF &center)
+void LengthEdgeConstraint::paintIcon(QPainter *painter, const QPointF &center, const EdgeItemNormal *edge)
 {
     painter->setPen(QColor(255, 0, 0));
     QFont font = painter->font();
     font.setPointSize(20);
     font.setBold(true);
     painter->setFont(font);
-    painter->drawText(center, "L");
+    painter->drawText(
+        center, "L " + QString::number(QLineF(edge->getStartVertex()->pos(), edge->getEndVertex()->pos()).length())
+    );
 }

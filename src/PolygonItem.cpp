@@ -4,7 +4,7 @@
 #include <iostream>
 
 #include "Constraints/ConstraintChecker.h"
-#include "EdgeItem.h"
+#include "Edge/EdgeItemNormal.h"
 #include "PolygonItem.h"
 
 PolygonItem::PolygonItem() : selectedVertexIndex(-1) {}
@@ -46,7 +46,7 @@ void PolygonItem::appendVertex(const QPointF &position)
     if (vertices.size() > 3)
     {
         // Remove the closing edge (from the last vertex to the first one)
-        EdgeItem *lastEdge = edges.last();
+        EdgeItemNormal *lastEdge = edges.last();
 
         VertexItem *firstVertex = vertices[0];
         VertexItem *lastVertex  = vertices[vertices.size() - 2];
@@ -63,7 +63,7 @@ void PolygonItem::appendVertex(const QPointF &position)
     {
         // Create an edge from the previous vertex to this one
         VertexItem *previousVertex = vertices[vertices.size() - 2];
-        EdgeItem *newEdge          = new EdgeItem(previousVertex, newVertex, this);
+        EdgeItemNormal *newEdge    = new EdgeItemNormal(previousVertex, newVertex, this);
         addEdge(newEdge);
     }
 
@@ -78,7 +78,7 @@ void PolygonItem::appendVertex(const QPointF &position)
         Q_ASSERT(firstVertex->edgeIn == nullptr && lastVertex->edgeOut == nullptr);
         Q_ASSERT(firstVertex->edgeOut != nullptr && lastVertex->edgeIn != nullptr);
 
-        EdgeItem *closingEdge = new EdgeItem(lastVertex, firstVertex, this);
+        EdgeItemNormal *closingEdge = new EdgeItemNormal(lastVertex, firstVertex, this);
         addEdge(closingEdge);
     }
 
@@ -106,11 +106,11 @@ void PolygonItem::insertVertex(unsigned int index, const QPointF &position)
 
     vertices.insert(index + 1, newVertex);
     deleteEdge(prevVertex->edgeOut);
-    addEdge(new EdgeItem(prevVertex, newVertex, this), index);
-    addEdge(new EdgeItem(newVertex, nextVertex, this), index + 1);
+    addEdge(new EdgeItemNormal(prevVertex, newVertex, this), index);
+    addEdge(new EdgeItemNormal(newVertex, nextVertex, this), index + 1);
 
     prepareGeometryChange();
-    assert(checkLinearOrdering());
+    Q_ASSERT(checkLinearOrdering());
 }
 
 void PolygonItem::deleteVertex(unsigned int index)
@@ -135,24 +135,24 @@ void PolygonItem::deleteVertex(unsigned int index)
         // the correct order
         Q_ASSERT(vertex->hasBothEdges());
 
-        EdgeItem *prevEdge = vertex->edgeIn;
-        EdgeItem *nextEdge = vertex->edgeOut;
+        EdgeItemNormal *prevEdge = vertex->edgeIn;
+        EdgeItemNormal *nextEdge = vertex->edgeOut;
         for (auto e : edges)
         {
             deleteEdge(e);
         }
         int lowerIdx  = std::min(vertices.indexOf(prevEdge->startVertex), vertices.indexOf(nextEdge->endVertex));
         int higherIdx = std::max(vertices.indexOf(prevEdge->startVertex), vertices.indexOf(nextEdge->endVertex));
-        addEdge(new EdgeItem(vertices[lowerIdx], vertices[higherIdx], this));
+        addEdge(new EdgeItemNormal(vertices[lowerIdx], vertices[higherIdx], this));
     }
     else if (vertices.size() > 3)
     {
         Q_ASSERT(vertex->hasBothEdges());
 
-        EdgeItem *prevEdge = vertex->edgeIn;
-        EdgeItem *nextEdge = vertex->edgeOut;
+        EdgeItemNormal *prevEdge = vertex->edgeIn;
+        EdgeItemNormal *nextEdge = vertex->edgeOut;
 
-        EdgeItem *mergeEdge = new EdgeItem(prevEdge->startVertex, nextEdge->endVertex, this);
+        EdgeItemNormal *mergeEdge = new EdgeItemNormal(prevEdge->startVertex, nextEdge->endVertex, this);
 
         int mergeIdx = edges.indexOf(prevEdge);
         deleteEdge(prevEdge);
@@ -178,7 +178,7 @@ void PolygonItem::deleteVertex(VertexItem *vertex)
 ////////////////////////////////////////////////////////////////////////////////
 //                              Edge Functions                                //
 ////////////////////////////////////////////////////////////////////////////////
-void PolygonItem::subdivideEdge(EdgeItem *edge)
+void PolygonItem::subdivideEdge(EdgeItemNormal *edge)
 {
     Q_ASSERT(edge->startVertex != edge->endVertex);
     Q_ASSERT(edges.contains(edge));
@@ -192,7 +192,7 @@ void PolygonItem::subdivideEdge(EdgeItem *edge)
     prepareGeometryChange();
 }
 
-void PolygonItem::addEdge(EdgeItem *edge, unsigned int idx)
+void PolygonItem::addEdge(EdgeItemNormal *edge, unsigned int idx)
 {
     Q_ASSERT(edge->startVertex != edge->endVertex);
 
@@ -204,7 +204,7 @@ void PolygonItem::addEdge(EdgeItem *edge, unsigned int idx)
     edge->startVertex->edgeOut = edge;
     edge->endVertex->edgeIn    = edge;
 }
-void PolygonItem::deleteEdge(EdgeItem *edge)
+void PolygonItem::deleteEdge(EdgeItemNormal *edge)
 {
     Q_ASSERT(edge->startVertex->edgeOut == edge || edge->startVertex->edgeIn == edge);
 
@@ -258,7 +258,7 @@ void PolygonItem::toggleIndexVisibility()
 void PolygonItem::toggleMoveAllVertices() { moveAllVertices = !moveAllVertices; }
 int PolygonItem::getVertexIndex(VertexItem *vertex) const { return vertices.indexOf(vertex); }
 
-int PolygonItem::getEdgeIndex(EdgeItem *edge) const { return edges.indexOf(edge); }
+int PolygonItem::getEdgeIndex(EdgeItemNormal *edge) const { return edges.indexOf(edge); }
 int PolygonItem::findClosestVertex(const QPointF &pos)
 {
     QList<QGraphicsView *> views = scene()->views();
@@ -339,8 +339,8 @@ bool PolygonItem::checkLinearOrdering()
         bool hasPrevEdge = vertex->edgeIn != nullptr && vertex->edgeIn->startVertex == prevVertex;
         bool hasNextEdge = vertex->edgeOut != nullptr && vertex->edgeOut->endVertex == nextVertex;
 
-        EdgeItem *prevEdge = vertex->edgeIn;
-        EdgeItem *nextEdge = vertex->edgeOut;
+        EdgeItemNormal *prevEdge = vertex->edgeIn;
+        EdgeItemNormal *nextEdge = vertex->edgeOut;
 
         // If either the previous or next edge is missing, the order is incorrect
         if (!hasPrevEdge || !hasNextEdge)
@@ -432,7 +432,7 @@ PolygonItem::~PolygonItem()
     qDeleteAll(edges);
 }
 
-void PolygonItem::applyConstraints(EdgeItem *edge)
+void PolygonItem::applyConstraints(EdgeItemNormal *edge)
 {
     Q_ASSERT(edge != nullptr);
 
