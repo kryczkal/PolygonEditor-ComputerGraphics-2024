@@ -2,17 +2,17 @@
 // Created by wookie on 10/11/24.
 //
 
-#ifndef POLYGONEDITOR_EDGEITEMNORMAL_H
-#define POLYGONEDITOR_EDGEITEMNORMAL_H
+#ifndef POLYGONEDITOR_POLYGONEDGEITEM_H
+#define POLYGONEDITOR_POLYGONEDGEITEM_H
 
-#include "EdgeItemBase.h"
+#include "BaseEdgeItem.h"
 #include <QAction>
 #include <QGraphicsItem>
 #include <QList>
 #include <QPainter>
 #include <gtest/gtest.h>
 
-class VertexItem;
+class PolygonVertexItem;
 class BaseEdgeConstraint;
 
 /*
@@ -22,10 +22,11 @@ class BaseEdgeConstraint;
  * @param end - end vertex of the edge
  * @param parent - parent item - (It is required that the parent item is a PolygonItem)
  */
-class EdgeItemNormal : public EdgeItemBase
+class PolygonEdgeItem : public BaseEdgeItem
 {
     public:
-    EdgeItemNormal(VertexItem *start, VertexItem *end, QGraphicsItem *parent = nullptr);
+    PolygonEdgeItem(PolygonVertexItem *start, PolygonVertexItem *end, QGraphicsItem *parent = nullptr);
+    PolygonEdgeItem(BaseVertexItem *start, BaseVertexItem *end, QGraphicsItem *parent = nullptr);
 
     [[nodiscard]] QRectF boundingRect() const override;
     void paintIndex(QPainter *painter, QPointF startPoint, QPointF endPoint, int edgeIndex) override;
@@ -34,9 +35,9 @@ class EdgeItemNormal : public EdgeItemBase
     void drawLine(QPainter *painter, QPointF startPoint, QPointF endPoint, bool useBresenham);
 
     [[maybe_unused]] void setConstraint(BaseEdgeConstraint *edgeConstraint);
-    [[nodiscard]] BaseEdgeConstraint *getConstraint() const;
+    [[nodiscard]] BaseEdgeConstraint *getConstraint() const override;
 
-    ~EdgeItemNormal() override;
+    ~PolygonEdgeItem() override;
 
     protected:
     BaseEdgeConstraint *edgeConstraint = nullptr;
@@ -44,8 +45,8 @@ class EdgeItemNormal : public EdgeItemBase
     void contextMenuEvent(QGraphicsSceneContextMenuEvent *event) override;
     static void bresenham(QPainter *painter, const QPointF &start, const QPointF &end, qreal width);
 
-    friend QDataStream &operator<<(QDataStream &out, const EdgeItemNormal &edge);
+    friend QDataStream &operator<<(QDataStream &out, const PolygonEdgeItem &edge);
     friend class PolygonItem;
 };
 
-#endif // POLYGONEDITOR_EDGEITEMNORMAL_H
+#endif // POLYGONEDITOR_POLYGONEDGEITEM_H

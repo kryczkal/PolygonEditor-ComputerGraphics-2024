@@ -2,38 +2,31 @@
 // Created by wookie on 10/11/24.
 //
 
-#ifndef POLYGONEDITOR_VERTEXITEM_H
-#define POLYGONEDITOR_VERTEXITEM_H
+#ifndef POLYGONEDITOR_POLYGONVERTEXITEM_H
+#define POLYGONEDITOR_POLYGONVERTEXITEM_H
 
 #include <QGraphicsItem>
 #include <QList>
 #include <QPainter>
 #include <gtest/gtest.h>
+#include "Vertex/BaseVertexItem.h"
+#include "Constraints/BaseVertexConstraint.h"
 
-class EdgeItemNormal;
+class BaseEdgeItem;
 /*
  * @brief Class representing a vertex in the polygon
  * @details The class is responsible for drawing the vertex on the scene and handling the context menu
  * @param position - position of the vertex
  * @param parent - parent item - (It is required that the parent item is a PolygonItem)
  */
-class VertexItem : public QGraphicsItem
+class PolygonVertexItem : public BaseVertexItem
 {
     public:
-    explicit VertexItem(const QPointF &position, QGraphicsItem *parent = nullptr);
-
-    [[nodiscard]] QRectF boundingRect() const override;
+    explicit PolygonVertexItem(const QPointF &position, QGraphicsItem *parent = nullptr);
 
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
 
-    EdgeItemNormal *edgeOut = nullptr;
-    EdgeItemNormal *edgeIn  = nullptr;
-
-    [[nodiscard]]
-    bool hasBothEdges() const;
-    bool hasOneEdge() const;
-
-    qreal radius = 5.0;
+    BaseVertexConstraint *getConstraint() const;
 
     protected:
     void mousePressEvent(QGraphicsSceneMouseEvent *event) override;
@@ -42,9 +35,10 @@ class VertexItem : public QGraphicsItem
 
     private:
     void contextMenuEvent(QGraphicsSceneContextMenuEvent *event) override;
+    BaseVertexConstraint* constraint = nullptr;
 
-    friend QDataStream &operator<<(QDataStream &out, const VertexItem &vertex);
+    friend QDataStream &operator<<(QDataStream &out, const PolygonVertexItem &vertex);
     friend class PolygonItem;
 };
 
-#endif // POLYGONEDITOR_VERTEXITEM_H
+#endif // POLYGONEDITOR_POLYGONVERTEXITEM_H

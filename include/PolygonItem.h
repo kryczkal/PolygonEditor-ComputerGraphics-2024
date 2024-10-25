@@ -1,13 +1,15 @@
 #ifndef POLYGONEDITOR_POLYGONITEM_H
 #define POLYGONEDITOR_POLYGONITEM_H
 
-#include "VertexItem.h"
+#include "Vertex/PolygonVertexItem.h"
+#include "Edge/BezierEdgeItem.h"
 #include <QGraphicsItem>
 #include <QList>
 #include <QPainter>
 #include <gtest/gtest.h>
 
-class EdgeItemNormal;
+class PolygonEdgeItem;
+class BaseEdgeItem;
 
 class PolygonItem : public QGraphicsItem
 {
@@ -21,17 +23,17 @@ class PolygonItem : public QGraphicsItem
     void insertVertex(unsigned int index, const QPointF &position);
 
     void deleteVertex(unsigned int index);
-    void deleteVertex(VertexItem *vertex);
+    void deleteVertex(PolygonVertexItem *vertex);
 
     void subdivideEdge(unsigned int index);
-    void subdivideEdge(EdgeItemNormal *edge);
+    void subdivideEdge(BaseEdgeItem *edge);
 
-    int getVertexIndex(VertexItem *vertex) const;
-    int getEdgeIndex(EdgeItemNormal *edge) const;
+    int getVertexIndex(PolygonVertexItem *vertex) const;
+    int getEdgeIndex(BaseEdgeItem *edge) const;
     void toggleIndexVisibility();
     void toggleMoveAllVertices();
 
-    void applyConstraints(EdgeItemNormal *edge);
+    void applyConstraints(BaseEdgeItem *edge);
 
     bool paintIndex      = true;
     bool moveAllVertices = false;
@@ -39,24 +41,28 @@ class PolygonItem : public QGraphicsItem
 
     ~PolygonItem();
 
-    protected:
+    void changeEdgeToBezier(PolygonEdgeItem *edgeItemNormal);
+
+    void changeEdgeToNormal(BezierEdgeItem *edgeItemBezier);
+
+protected:
     void mousePressEvent(QGraphicsSceneMouseEvent *event) override;
     void mouseMoveEvent(QGraphicsSceneMouseEvent *event) override;
     void mouseReleaseEvent(QGraphicsSceneMouseEvent *event) override;
 
     private:
-    void addEdge(EdgeItemNormal *edge, unsigned int idx = -1);
-    void deleteEdge(EdgeItemNormal *edge);
+    void addEdge(BaseEdgeItem *edge, unsigned int idx = -1);
+    void deleteEdge(BaseEdgeItem *edge);
     int findClosestVertex(const QPointF &pos);
 
     bool checkLinearOrdering();
 
-    QList<VertexItem *> vertices;
-    QList<EdgeItemNormal *> edges;
+    QList<BaseVertexItem *> vertices;
+    QList<BaseEdgeItem *> edges;
     int selectedVertexIndex;
 
     FRIEND_TEST(PolygonItemTest, CheckLinearOrdering);
-    void printOrderingStatus(VertexItem *vertex, const QString &message) const;
+    void printOrderingStatus(BaseVertexItem *vertex, const QString &message) const;
 };
 
 #endif // POLYGONEDITOR_POLYGONITEM_H

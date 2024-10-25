@@ -4,10 +4,10 @@
 
 #include "Constraints/LengthEdgeConstraint.h"
 #include "Constraints/ConstraintChecker.h"
-#include "Edge/EdgeItemNormal.h"
-#include "VertexItem.h"
+#include "Edge/PolygonEdgeItem.h"
+#include "Vertex/PolygonVertexItem.h"
 
-bool LengthEdgeConstraint::check(EdgeItemNormal *edge, SearchDirection direction)
+bool LengthEdgeConstraint::check(PolygonEdgeItem *edge, SearchDirection direction)
 {
     if (direction == SearchDirection::Forward)
     {
@@ -19,7 +19,7 @@ bool LengthEdgeConstraint::check(EdgeItemNormal *edge, SearchDirection direction
     }
 }
 
-void LengthEdgeConstraint::apply(EdgeItemNormal *edge, SearchDirection direction)
+void LengthEdgeConstraint::apply(PolygonEdgeItem *edge, SearchDirection direction)
 {
     if (direction == SearchDirection::Forward)
     {
@@ -35,7 +35,7 @@ void LengthEdgeConstraint::apply(EdgeItemNormal *edge, SearchDirection direction
     }
 }
 
-void LengthEdgeConstraint::paintIcon(QPainter *painter, const QPointF &center, const EdgeItemNormal *edge)
+void LengthEdgeConstraint::paintIcon(QPainter *painter, const QPointF &center, const PolygonEdgeItem *edge)
 {
     painter->setPen(QColor(255, 0, 0));
     QFont font = painter->font();

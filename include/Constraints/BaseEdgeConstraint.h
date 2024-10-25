@@ -6,14 +6,14 @@
 #define POLYGONEDITOR_BASEEDGECONSTRAINT_H
 #include <QPainter>
 
-class EdgeItemNormal;
+class PolygonEdgeItem;
 enum class SearchDirection;
 
 class BaseEdgeConstraint
 {
     public:
     virtual ~BaseEdgeConstraint()                                       = default;
-    virtual bool check(EdgeItemNormal *edge, SearchDirection direction) = 0;
+    virtual bool check(PolygonEdgeItem *edge, SearchDirection direction) = 0;
     /*
      * @brief Applies the edgeConstraint to the edge
      * @param edge - edge to which the edgeConstraint is applied, if a correction is required, adjusting the in or out
@@ -22,8 +22,8 @@ class BaseEdgeConstraint
      * @param direction - direction of the search and correction
      * @return void
      */
-    virtual void apply(EdgeItemNormal *edge, SearchDirection direction)                      = 0;
-    virtual void paintIcon(QPainter *painter, const QPointF &center, const EdgeItemNormal *) = 0;
+    virtual void apply(PolygonEdgeItem *edge, SearchDirection direction)                      = 0;
+    virtual void paintIcon(QPainter *painter, const QPointF &center, const PolygonEdgeItem *) = 0;
 };
 
 #endif // POLYGONEDITOR_BASEEDGECONSTRAINT_H

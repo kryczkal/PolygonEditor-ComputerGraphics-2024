@@ -10,9 +10,9 @@
 class VerticalEdgeConstraint : public BaseEdgeConstraint
 {
     public:
-    bool check(EdgeItemNormal *edge, SearchDirection direction) override;
-    void apply(EdgeItemNormal *edge, SearchDirection direction) override;
-    void paintIcon(QPainter *painter, const QPointF &center, const EdgeItemNormal *) override;
+    bool check(PolygonEdgeItem *edge, SearchDirection direction) override;
+    void apply(PolygonEdgeItem *edge, SearchDirection direction) override;
+    void paintIcon(QPainter *painter, const QPointF &center, const PolygonEdgeItem *) override;
 };
 
 #endif // POLYGONEDITOR_VERTICALEDGECONSTRAINT_H

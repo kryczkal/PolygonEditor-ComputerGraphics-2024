@@ -12,9 +12,9 @@ class LengthEdgeConstraint : public BaseEdgeConstraint
 {
     public:
     explicit LengthEdgeConstraint(double length) : constraintLength(length) {}
-    bool check(EdgeItemNormal *edge, SearchDirection direction) override;
-    void apply(EdgeItemNormal *edge, SearchDirection direction) override;
-    void paintIcon(QPainter *painter, const QPointF &center, const EdgeItemNormal *) override;
+    bool check(PolygonEdgeItem *edge, SearchDirection direction) override;
+    void apply(PolygonEdgeItem *edge, SearchDirection direction) override;
+    void paintIcon(QPainter *painter, const QPointF &center, const PolygonEdgeItem *) override;
 
     private:
     double constraintLength;

@@ -2,8 +2,8 @@
 // Created by wookie on 10/11/24.
 //
 
-#ifndef POLYGONEDITOR_EDGEITEMBASE_H
-#define POLYGONEDITOR_EDGEITEMBASE_H
+#ifndef POLYGONEDITOR_BASEEDGEITEM_H
+#define POLYGONEDITOR_BASEEDGEITEM_H
 
 #include <QAction>
 #include <QGraphicsItem>
@@ -11,30 +11,31 @@
 #include <QPainter>
 #include <gtest/gtest.h>
 
-class VertexItem;
+class BaseVertexItem;
 class BaseEdgeConstraint;
 
-class EdgeItemBase : public QGraphicsItem
+class BaseEdgeItem : public QGraphicsItem
 {
     public:
-    EdgeItemBase(VertexItem *start, VertexItem *end, QGraphicsItem *parent = nullptr);
+    BaseEdgeItem(BaseVertexItem *start, BaseVertexItem *end, QGraphicsItem *parent = nullptr);
 
     virtual QRectF boundingRect() const                                                             = 0;
     virtual void paintIndex(QPainter *painter, QPointF startPoint, QPointF endPoint, int edgeIndex) = 0;
     virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)  = 0;
 
-    VertexItem *getStartVertex() const;
-    VertexItem *getEndVertex() const;
+    BaseVertexItem *getStartVertex() const;
+    BaseVertexItem *getEndVertex() const;
 
-    virtual ~EdgeItemBase();
+    virtual ~BaseEdgeItem();
 
+    [[nodiscard]] virtual BaseEdgeConstraint *getConstraint() const = 0;
     protected:
-    VertexItem *startVertex;
-    VertexItem *endVertex;
+    BaseVertexItem *startVertex;
+    BaseVertexItem *endVertex;
     qreal width = 2.0;
 
     virtual void contextMenuEvent(QGraphicsSceneContextMenuEvent *event) = 0;
     friend class PolygonItem;
 };
 
-#endif // POLYGONEDITOR_EDGEITEMBASE_H
+#endif // POLYGONEDITOR_BASEEDGEITEM_H
