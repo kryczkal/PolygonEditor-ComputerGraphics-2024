@@ -161,8 +161,7 @@ void PolygonEdgeItem::contextMenuEvent(QGraphicsSceneContextMenuEvent *event)
             removeConstraintAction, &QAction::triggered,
             [this]
             {
-                delete edgeConstraint;
-                edgeConstraint = nullptr;
+                deleteConstraint();
             }
         );
     }
@@ -173,9 +172,7 @@ void PolygonEdgeItem::contextMenuEvent(QGraphicsSceneContextMenuEvent *event)
             setHorizontalConstraintAction, &QAction::triggered,
             [this]
             {
-                edgeConstraint = new HorizontalEdgeConstraint();
-                dynamic_cast<PolygonItem *>(parentItem())->applyConstraints(this);
-                scene()->update();
+                addHorizontalConstraint();
             }
         );
         setVerticalConstraintAction = menu.addAction("Set Vertical Constraint");
@@ -183,9 +180,7 @@ void PolygonEdgeItem::contextMenuEvent(QGraphicsSceneContextMenuEvent *event)
             setVerticalConstraintAction, &QAction::triggered,
             [this]
             {
-                edgeConstraint = new VerticalEdgeConstraint();
-                dynamic_cast<PolygonItem *>(parentItem())->applyConstraints(this);
-                scene()->update();
+                addVerticalConstraint();
             }
         );
         setLengthConstraintAction = menu.addAction("Set Length Constraint");
@@ -193,6 +188,43 @@ void PolygonEdgeItem::contextMenuEvent(QGraphicsSceneContextMenuEvent *event)
             setLengthConstraintAction, &QAction::triggered,
             [&]
             {
+                addLengthConstraint();
+            }
+        );
+    }
+
+    changeToBezierAction = menu.addAction("Change to Bezier");
+    QIODevice::connect(
+        changeToBezierAction, &QAction::triggered,
+        [this]
+        {
+            makeBezier();
+        }
+    );
+
+    menu.exec(event->screenPos());
+}
+
+
+[[maybe_unused]] void PolygonEdgeItem::setConstraint(BaseEdgeConstraint *edgeConstraint)
+{
+    this->edgeConstraint = edgeConstraint;
+}
+
+void PolygonEdgeItem::deleteConstraint()
+{
+                delete edgeConstraint;
+                edgeConstraint = nullptr;
+}
+
+PolygonEdgeItem::~PolygonEdgeItem() { delete edgeConstraint; }
+
+BaseEdgeConstraint *PolygonEdgeItem::getConstraint() const {
+    return this->edgeConstraint;
+}
+
+void PolygonEdgeItem::addLengthConstraint()
+{
                 QInputDialog dialog;
                 dialog.setLabelText("Length:");
                 dialog.setDoubleMinimum(0);
@@ -212,32 +244,34 @@ void PolygonEdgeItem::contextMenuEvent(QGraphicsSceneContextMenuEvent *event)
                     }
                 );
                 dialog.exec();
-            }
-        );
-    }
+}
 
-    changeToBezierAction = menu.addAction("Change to Bezier");
-    QIODevice::connect(
-        changeToBezierAction, &QAction::triggered,
-        [this]
-        {
+void PolygonEdgeItem::addLengthConstraintNoWindow()
+{
+    double length = QLineF(startVertex->pos(), endVertex->pos()).length();
+                    edgeConstraint = new LengthEdgeConstraint(length);
+                    dynamic_cast<PolygonItem *>(parentItem())->applyConstraints(this);
+                    ConstraintChecker::runApply(this, this);
+                    scene()->update();
+}
+
+void PolygonEdgeItem::addHorizontalConstraint()
+{
+                edgeConstraint = new HorizontalEdgeConstraint();
+                dynamic_cast<PolygonItem *>(parentItem())->applyConstraints(this);
+                scene()->update();
+}
+
+void PolygonEdgeItem::addVerticalConstraint()
+{
+                edgeConstraint = new VerticalEdgeConstraint();
+                dynamic_cast<PolygonItem *>(parentItem())->applyConstraints(this);
+                scene()->update();
+}
+
+void PolygonEdgeItem::makeBezier()
+{
             PolygonItem *polygon = dynamic_cast<PolygonItem *>(parentItem());
             polygon->changeEdgeToBezier(this);
-        }
-    );
-
-    menu.exec(event->screenPos());
-}
-
-
-[[maybe_unused]] void PolygonEdgeItem::setConstraint(BaseEdgeConstraint *edgeConstraint)
-{
-    this->edgeConstraint = edgeConstraint;
-}
-
-PolygonEdgeItem::~PolygonEdgeItem() { delete edgeConstraint; }
-
-BaseEdgeConstraint *PolygonEdgeItem::getConstraint() const {
-    return this->edgeConstraint;
 }
 

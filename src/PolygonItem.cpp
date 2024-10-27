@@ -10,6 +10,24 @@
 
 PolygonItem::PolygonItem() : selectedVertexIndex(-1) {}
 
+void PolygonItem::createDefaultPolygon()
+{
+    appendVertex(QPointF(10, 10));
+    appendVertex(QPointF(200, 10));
+    appendVertex(QPointF(200, 200));
+    appendVertex(QPointF(150, 300));
+    appendVertex(QPointF(10, 200));
+    PolygonEdgeItem* casted_edge = reinterpret_cast<PolygonEdgeItem *>(edges[0]);
+    casted_edge->addHorizontalConstraint();
+    casted_edge = reinterpret_cast<PolygonEdgeItem *>(edges[1]);
+    casted_edge->addVerticalConstraint();
+    casted_edge = reinterpret_cast<PolygonEdgeItem *>(edges[2]);
+    casted_edge->addLengthConstraintNoWindow();
+    casted_edge = reinterpret_cast<PolygonEdgeItem *>(edges[4]);
+    casted_edge->makeBezier();
+
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 //                              QGraphicsItem Functions                       //
 ////////////////////////////////////////////////////////////////////////////////

@@ -16,6 +16,8 @@ class PolygonItem : public QGraphicsItem
     public:
     PolygonItem();
 
+    void createDefaultPolygon();
+
     QRectF boundingRect() const override;
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
 

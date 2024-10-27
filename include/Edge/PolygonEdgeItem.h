@@ -37,6 +37,13 @@ class PolygonEdgeItem : public BaseEdgeItem
     [[maybe_unused]] void setConstraint(BaseEdgeConstraint *edgeConstraint);
     [[nodiscard]] BaseEdgeConstraint *getConstraint() const override;
 
+    void addLengthConstraint();
+    void addLengthConstraintNoWindow();
+    void addHorizontalConstraint();
+    void addVerticalConstraint();
+    void makeBezier();
+    void deleteConstraint();
+
     ~PolygonEdgeItem() override;
 
     protected:

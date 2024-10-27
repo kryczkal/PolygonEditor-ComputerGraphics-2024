@@ -55,6 +55,9 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
     QVBoxLayout *mainLayout = new QVBoxLayout(centralWidget);
     mainLayout->addWidget(mainSplitter);
 
+    ToggleIndexVisibility();
+    polygonItem->createDefaultPolygon();
+
     // Connect button to the handler
     connect(button1, &QPushButton::clicked, this, &MainWindow::DeletePolygon);
     connect(button2, &QPushButton::clicked, this, &MainWindow::AddVertex);
