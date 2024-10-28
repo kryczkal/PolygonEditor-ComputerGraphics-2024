@@ -23,14 +23,16 @@ class ConstraintChecker
      * @param direction - direction of the search
      * @return true if all constraints are met, false otherwise
      */
-    static bool runCheck(BaseEdgeItem *edge, BaseEdgeItem *stopEdge, SearchDirection direction = SearchDirection::Forward);
+    static bool
+    runCheck(BaseEdgeItem *edge, BaseEdgeItem *stopEdge, SearchDirection direction = SearchDirection::Forward);
     /*
      * Best effort to apply constraints to all edges starting from edge to stopEdge
      * @param edge - edge to start applying from
      * @param stopEdge - edge to stop applying at
      * @param direction - direction of the search and constraints application
      */
-    static void runApply(BaseEdgeItem *edge, BaseEdgeItem *stopEdge, SearchDirection direction = SearchDirection::Forward);
+    static void
+    runApply(BaseEdgeItem *edge, BaseEdgeItem *stopEdge, SearchDirection direction = SearchDirection::Forward);
 
     private:
     static bool runCheckInternal(BaseEdgeItem *edge, BaseEdgeItem *stopEdge, SearchDirection direction);

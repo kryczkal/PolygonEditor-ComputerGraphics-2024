@@ -1,8 +1,8 @@
 #ifndef POLYGONEDITOR_POLYGONITEM_H
 #define POLYGONEDITOR_POLYGONITEM_H
 
-#include "Vertex/PolygonVertexItem.h"
 #include "Edge/BezierEdgeItem.h"
+#include "Vertex/PolygonVertexItem.h"
 #include <QGraphicsItem>
 #include <QList>
 #include <QPainter>
@@ -47,7 +47,7 @@ class PolygonItem : public QGraphicsItem
 
     void changeEdgeToNormal(BezierEdgeItem *edgeItemBezier);
 
-protected:
+    protected:
     void mousePressEvent(QGraphicsSceneMouseEvent *event) override;
     void mouseMoveEvent(QGraphicsSceneMouseEvent *event) override;
     void mouseReleaseEvent(QGraphicsSceneMouseEvent *event) override;

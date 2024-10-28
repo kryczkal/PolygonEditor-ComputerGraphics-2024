@@ -29,6 +29,7 @@ class BaseEdgeItem : public QGraphicsItem
     virtual ~BaseEdgeItem();
 
     [[nodiscard]] virtual BaseEdgeConstraint *getConstraint() const = 0;
+
     protected:
     BaseVertexItem *startVertex;
     BaseVertexItem *endVertex;

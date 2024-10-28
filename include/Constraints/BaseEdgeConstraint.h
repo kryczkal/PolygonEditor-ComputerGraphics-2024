@@ -12,7 +12,7 @@ enum class SearchDirection;
 class BaseEdgeConstraint
 {
     public:
-    virtual ~BaseEdgeConstraint()                                       = default;
+    virtual ~BaseEdgeConstraint()                                        = default;
     virtual bool check(PolygonEdgeItem *edge, SearchDirection direction) = 0;
     /*
      * @brief Applies the edgeConstraint to the edge

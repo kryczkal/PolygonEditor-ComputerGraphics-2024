@@ -9,21 +9,21 @@
 
 class BaseVertexItem;
 
-class StandaloneEdgeItem : public BaseEdgeItem {
+class StandaloneEdgeItem : public BaseEdgeItem
+{
     public:
-        StandaloneEdgeItem(BaseVertexItem *start, BaseVertexItem *end, QGraphicsItem *parent = nullptr);
-        [[nodiscard]] QRectF boundingRect() const override;
-        void paintIndex(QPainter *painter, QPointF startPoint, QPointF endPoint, int edgeIndex) override;
-        void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
+    StandaloneEdgeItem(BaseVertexItem *start, BaseVertexItem *end, QGraphicsItem *parent = nullptr);
+    [[nodiscard]] QRectF boundingRect() const override;
+    void paintIndex(QPainter *painter, QPointF startPoint, QPointF endPoint, int edgeIndex) override;
+    void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
 
-        [[nodiscard]] BaseEdgeConstraint *getConstraint() const override;
+    [[nodiscard]] BaseEdgeConstraint *getConstraint() const override;
 
     protected:
-        void contextMenuEvent(QGraphicsSceneContextMenuEvent *event) override;
+    void contextMenuEvent(QGraphicsSceneContextMenuEvent *event) override;
 
-        friend QDataStream &operator<<(QDataStream &out, const StandaloneEdgeItem &edge);
-        friend class PolygonItem;
+    friend QDataStream &operator<<(QDataStream &out, const StandaloneEdgeItem &edge);
+    friend class PolygonItem;
 };
 
-
-#endif //POLYGONEDITOR_STANDALONEEDGEITEM_H
+#endif // POLYGONEDITOR_STANDALONEEDGEITEM_H

@@ -13,8 +13,9 @@
 class PolygonEdgeItem;
 class BaseEdgeItem;
 
-class BaseVertexItem : public QGraphicsItem {
-public:
+class BaseVertexItem : public QGraphicsItem
+{
+    public:
     explicit BaseVertexItem(const QPointF &position, QGraphicsItem *parent = nullptr);
 
     [[nodiscard]] QRectF boundingRect() const override;
@@ -30,15 +31,14 @@ public:
 
     qreal radius = 5.0;
 
-protected:
+    protected:
     void mousePressEvent(QGraphicsSceneMouseEvent *event) override;
     void mouseMoveEvent(QGraphicsSceneMouseEvent *event) override;
     void mouseReleaseEvent(QGraphicsSceneMouseEvent *event) override;
 
-private:
+    private:
     void contextMenuEvent(QGraphicsSceneContextMenuEvent *event) override = 0;
     friend class PolygonItem;
 };
 
-
-#endif //POLYGONEDITOR_BASEVERTEXITEM_H
+#endif // POLYGONEDITOR_BASEVERTEXITEM_H

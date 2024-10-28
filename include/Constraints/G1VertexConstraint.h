@@ -7,7 +7,8 @@
 
 #include "BaseVertexConstraint.h"
 
-class G1VertexConstraint : public BaseVertexConstraint {
+class G1VertexConstraint : public BaseVertexConstraint
+{
     void apply(PolygonVertexItem *vertexItem) override;
     void apply(ControlVertexItem *controlVertexItem) override;
     void paintIcon(QPainter *painter, const QPointF &center, const PolygonVertexItem *) override;
@@ -16,10 +17,9 @@ class G1VertexConstraint : public BaseVertexConstraint {
 
     static void applyG1ContinuityToIncomingEdge(PolygonVertexItem *vertexItem, BezierEdgeItem *castEdgeIn);
 
-    static QPointF
-    calculateParallelControlPoint(const QPointF &basePos, const QPointF &targetPos,
-                                  const QPointF &currentControlPointPos);
+    static QPointF calculateParallelControlPoint(
+        const QPointF &basePos, const QPointF &targetPos, const QPointF &currentControlPointPos
+    );
 };
 
-
-#endif //POLYGONEDITOR_G1VERTEXCONSTRAINT_H
+#endif // POLYGONEDITOR_G1VERTEXCONSTRAINT_H

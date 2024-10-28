@@ -9,8 +9,9 @@
 class ControlVertexItem;
 class StandaloneEdgeItem;
 
-class BezierEdgeItem : public BaseEdgeItem{
-public:
+class BezierEdgeItem : public BaseEdgeItem
+{
+    public:
     BezierEdgeItem(PolygonVertexItem *start, PolygonVertexItem *end, QGraphicsItem *parent = nullptr);
     BezierEdgeItem(BaseVertexItem *start, BaseVertexItem *end, QGraphicsItem *parent = nullptr);
     QRectF boundingRect() const override;
@@ -20,11 +21,12 @@ public:
     BaseEdgeConstraint *getConstraint() const override;
 
     ~BezierEdgeItem() override;
-protected:
+
+    protected:
     ControlVertexItem *startControlPoint = nullptr;
-    ControlVertexItem *endControlPoint = nullptr;
+    ControlVertexItem *endControlPoint   = nullptr;
     StandaloneEdgeItem *startControlEdge = nullptr;
-    StandaloneEdgeItem *endControlEdge = nullptr;
+    StandaloneEdgeItem *endControlEdge   = nullptr;
 
     static constexpr int DRAW_ITERATION_STEPS = 100;
 
@@ -36,4 +38,4 @@ protected:
     friend class G1VertexConstraint;
 };
 
-#endif //POLYGONEDITOR_BEZIEREDGEITEM_H
+#endif // POLYGONEDITOR_BEZIEREDGEITEM_H

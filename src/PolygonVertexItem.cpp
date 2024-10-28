@@ -1,10 +1,10 @@
 #include "Vertex/PolygonVertexItem.h"
-#include "Vertex/BaseVertexItem.h"
+#include "Constraints/C1VertexConstraint.h"
 #include "Constraints/ConstraintChecker.h"
+#include "Constraints/G1VertexConstraint.h"
 #include "Edge/PolygonEdgeItem.h"
 #include "PolygonItem.h"
-#include "Constraints/G1VertexConstraint.h"
-#include "Constraints/C1VertexConstraint.h"
+#include "Vertex/BaseVertexItem.h"
 #include <QAction>
 #include <QGraphicsSceneContextMenuEvent>
 #include <QGraphicsSceneMouseEvent>
@@ -49,35 +49,53 @@ void PolygonVertexItem::paint(QPainter *painter, const QStyleOptionGraphicsItem 
 void PolygonVertexItem::contextMenuEvent(QGraphicsSceneContextMenuEvent *event)
 {
     QMenu menu;
-    QAction *deleteAction   = menu.addAction("Delete");
-    QIODevice::connect(deleteAction, &QAction::triggered, [this]() {
-        PolygonItem *polygon = dynamic_cast<PolygonItem *>(parentItem());
-        polygon->deleteVertex(this);
-    });
-    if (dynamic_cast<BezierEdgeItem*>(edgeIn) || dynamic_cast<BezierEdgeItem*>(edgeOut)) {
-        if (!constraint) {
-            QAction *addG1Constraint = menu.addAction("Add G1 constraint");
-            QIODevice::connect(addG1Constraint, &QAction::triggered, [this]() {
-                this->constraint = new G1VertexConstraint();
-                this->constraint->apply(this);
-            });
-            QAction *addC1Constraint = menu.addAction("Add C1 constraint");
-            QIODevice::connect(addC1Constraint, &QAction::triggered, [this]() {
-                this->constraint = new C1VertexConstraint();
-                this->constraint->apply(this);
-            });
+    QAction *deleteAction = menu.addAction("Delete");
+    QIODevice::connect(
+        deleteAction, &QAction::triggered,
+        [this]()
+        {
+            PolygonItem *polygon = dynamic_cast<PolygonItem *>(parentItem());
+            polygon->deleteVertex(this);
         }
-        else {
+    );
+    if (dynamic_cast<BezierEdgeItem *>(edgeIn) || dynamic_cast<BezierEdgeItem *>(edgeOut))
+    {
+        if (!constraint)
+        {
+            QAction *addG1Constraint = menu.addAction("Add G1 constraint");
+            QIODevice::connect(
+                addG1Constraint, &QAction::triggered,
+                [this]()
+                {
+                    this->constraint = new G1VertexConstraint();
+                    this->constraint->apply(this);
+                }
+            );
+            QAction *addC1Constraint = menu.addAction("Add C1 constraint");
+            QIODevice::connect(
+                addC1Constraint, &QAction::triggered,
+                [this]()
+                {
+                    this->constraint = new C1VertexConstraint();
+                    this->constraint->apply(this);
+                }
+            );
+        }
+        else
+        {
             QAction *removeConstraint = menu.addAction("Remove constraint");
-            QIODevice::connect(removeConstraint, &QAction::triggered, [this]() {
-                delete this->constraint;
-                this->constraint = nullptr;
-            });
+            QIODevice::connect(
+                removeConstraint, &QAction::triggered,
+                [this]()
+                {
+                    delete this->constraint;
+                    this->constraint = nullptr;
+                }
+            );
         }
     }
 
     menu.exec(event->screenPos());
-
 }
 
 QDataStream &operator<<(QDataStream &out, const PolygonVertexItem &vertex)
@@ -102,7 +120,8 @@ void PolygonVertexItem::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
         return;
 
     polygon->applyConstraints(edgeOut);
-    if (constraint) constraint->apply(this);
+    if (constraint)
+        constraint->apply(this);
 
     BaseVertexItem::mouseMoveEvent(event);
 }
@@ -116,6 +135,4 @@ void PolygonVertexItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
     BaseVertexItem::mouseReleaseEvent(event);
 }
 
-BaseVertexConstraint *PolygonVertexItem::getConstraint() const {
-    return constraint;
-}
+BaseVertexConstraint *PolygonVertexItem::getConstraint() const { return constraint; }

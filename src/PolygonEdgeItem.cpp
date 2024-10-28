@@ -20,8 +20,9 @@ PolygonEdgeItem::PolygonEdgeItem(PolygonVertexItem *start, PolygonVertexItem *en
 {
     Q_ASSERT(dynamic_cast<PolygonItem *>(parent) != nullptr); // Parent must be a PolygonItem
 }
-PolygonEdgeItem::PolygonEdgeItem(BaseVertexItem *start, BaseVertexItem *end, QGraphicsItem *parent) :
-    BaseEdgeItem(start, end, parent) {
+PolygonEdgeItem::PolygonEdgeItem(BaseVertexItem *start, BaseVertexItem *end, QGraphicsItem *parent)
+    : BaseEdgeItem(start, end, parent)
+{
     PolygonVertexItem *startVertex = dynamic_cast<PolygonVertexItem *>(start);
     PolygonVertexItem *endVertex   = dynamic_cast<PolygonVertexItem *>(end);
     Q_ASSERT(startVertex != nullptr);
@@ -205,7 +206,6 @@ void PolygonEdgeItem::contextMenuEvent(QGraphicsSceneContextMenuEvent *event)
     menu.exec(event->screenPos());
 }
 
-
 [[maybe_unused]] void PolygonEdgeItem::setConstraint(BaseEdgeConstraint *edgeConstraint)
 {
     this->edgeConstraint = edgeConstraint;
@@ -213,65 +213,62 @@ void PolygonEdgeItem::contextMenuEvent(QGraphicsSceneContextMenuEvent *event)
 
 void PolygonEdgeItem::deleteConstraint()
 {
-                delete edgeConstraint;
-                edgeConstraint = nullptr;
+    delete edgeConstraint;
+    edgeConstraint = nullptr;
 }
 
 PolygonEdgeItem::~PolygonEdgeItem() { delete edgeConstraint; }
 
-BaseEdgeConstraint *PolygonEdgeItem::getConstraint() const {
-    return this->edgeConstraint;
-}
+BaseEdgeConstraint *PolygonEdgeItem::getConstraint() const { return this->edgeConstraint; }
 
 void PolygonEdgeItem::addLengthConstraint()
 {
-                QInputDialog dialog;
-                dialog.setLabelText("Length:");
-                dialog.setDoubleMinimum(0);
-                dialog.setDoubleMaximum(std::numeric_limits<double>::max());
-                dialog.setDoubleValue(QLineF(startVertex->pos(), endVertex->pos()).length());
-                QIODevice::connect(
-                    &dialog, &QInputDialog::accepted,
-                    [&]()
-                    {
-                        double length = dialog.doubleValue();
-                        if (length <= 0)
-                            return;
-                        edgeConstraint = new LengthEdgeConstraint(length);
-                        dynamic_cast<PolygonItem *>(parentItem())->applyConstraints(this);
-                        ConstraintChecker::runApply(this, this);
-                        scene()->update();
-                    }
-                );
-                dialog.exec();
+    QInputDialog dialog;
+    dialog.setLabelText("Length:");
+    dialog.setDoubleMinimum(0);
+    dialog.setDoubleMaximum(std::numeric_limits<double>::max());
+    dialog.setDoubleValue(QLineF(startVertex->pos(), endVertex->pos()).length());
+    QIODevice::connect(
+        &dialog, &QInputDialog::accepted,
+        [&]()
+        {
+            double length = dialog.doubleValue();
+            if (length <= 0)
+                return;
+            edgeConstraint = new LengthEdgeConstraint(length);
+            dynamic_cast<PolygonItem *>(parentItem())->applyConstraints(this);
+            ConstraintChecker::runApply(this, this);
+            scene()->update();
+        }
+    );
+    dialog.exec();
 }
 
 void PolygonEdgeItem::addLengthConstraintNoWindow()
 {
-    double length = QLineF(startVertex->pos(), endVertex->pos()).length();
-                    edgeConstraint = new LengthEdgeConstraint(length);
-                    dynamic_cast<PolygonItem *>(parentItem())->applyConstraints(this);
-                    ConstraintChecker::runApply(this, this);
-                    scene()->update();
+    double length  = QLineF(startVertex->pos(), endVertex->pos()).length();
+    edgeConstraint = new LengthEdgeConstraint(length);
+    dynamic_cast<PolygonItem *>(parentItem())->applyConstraints(this);
+    ConstraintChecker::runApply(this, this);
+    scene()->update();
 }
 
 void PolygonEdgeItem::addHorizontalConstraint()
 {
-                edgeConstraint = new HorizontalEdgeConstraint();
-                dynamic_cast<PolygonItem *>(parentItem())->applyConstraints(this);
-                scene()->update();
+    edgeConstraint = new HorizontalEdgeConstraint();
+    dynamic_cast<PolygonItem *>(parentItem())->applyConstraints(this);
+    scene()->update();
 }
 
 void PolygonEdgeItem::addVerticalConstraint()
 {
-                edgeConstraint = new VerticalEdgeConstraint();
-                dynamic_cast<PolygonItem *>(parentItem())->applyConstraints(this);
-                scene()->update();
+    edgeConstraint = new VerticalEdgeConstraint();
+    dynamic_cast<PolygonItem *>(parentItem())->applyConstraints(this);
+    scene()->update();
 }
 
 void PolygonEdgeItem::makeBezier()
 {
-            PolygonItem *polygon = dynamic_cast<PolygonItem *>(parentItem());
-            polygon->changeEdgeToBezier(this);
+    PolygonItem *polygon = dynamic_cast<PolygonItem *>(parentItem());
+    polygon->changeEdgeToBezier(this);
 }
-

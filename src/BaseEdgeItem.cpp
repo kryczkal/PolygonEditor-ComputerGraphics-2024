@@ -21,5 +21,4 @@ BaseEdgeItem::BaseEdgeItem(BaseVertexItem *start, BaseVertexItem *end, QGraphics
 BaseVertexItem *BaseEdgeItem::getStartVertex() const { return startVertex; }
 BaseVertexItem *BaseEdgeItem::getEndVertex() const { return endVertex; }
 
-BaseEdgeItem::~BaseEdgeItem() {
-}
+BaseEdgeItem::~BaseEdgeItem() {}

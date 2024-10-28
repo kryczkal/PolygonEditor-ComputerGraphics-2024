@@ -4,9 +4,9 @@
 
 #include "Constraints/ConstraintChecker.h"
 #include "Constraints/BaseEdgeConstraint.h"
+#include "Edge/BaseEdgeItem.h"
 #include "Edge/BezierEdgeItem.h"
 #include "Vertex/PolygonVertexItem.h"
-#include "Edge/BaseEdgeItem.h"
 
 bool ConstraintChecker::runCheck(BaseEdgeItem *edge, BaseEdgeItem *stopEdge, SearchDirection direction)
 {
@@ -39,11 +39,13 @@ void ConstraintChecker::runApply(BaseEdgeItem *edge, BaseEdgeItem *stopEdge, Sea
     BezierEdgeItem *castEdge = dynamic_cast<BezierEdgeItem *>(edge);
     if (castEdge)
     {
-        PolygonVertexItem* startVertex = reinterpret_cast<PolygonVertexItem *>(castEdge->getStartVertex());
-        PolygonVertexItem* endVertex = reinterpret_cast<PolygonVertexItem *>(castEdge->getEndVertex());
+        PolygonVertexItem *startVertex = reinterpret_cast<PolygonVertexItem *>(castEdge->getStartVertex());
+        PolygonVertexItem *endVertex   = reinterpret_cast<PolygonVertexItem *>(castEdge->getEndVertex());
 
-        if (startVertex->getConstraint()) startVertex->getConstraint()->apply(startVertex);
-        if (endVertex->getConstraint()) endVertex->getConstraint()->apply(endVertex);
+        if (startVertex->getConstraint())
+            startVertex->getConstraint()->apply(startVertex);
+        if (endVertex->getConstraint())
+            endVertex->getConstraint()->apply(endVertex);
     }
 
     runApplyInternal(getNextEdge(edge, direction), stopEdge, direction);
@@ -80,11 +82,13 @@ void ConstraintChecker::runApplyInternal(BaseEdgeItem *edge, BaseEdgeItem *stopE
     BezierEdgeItem *castEdge = dynamic_cast<BezierEdgeItem *>(edge);
     if (castEdge)
     {
-        PolygonVertexItem* startVertex = reinterpret_cast<PolygonVertexItem *>(castEdge->getStartVertex());
-        PolygonVertexItem* endVertex = reinterpret_cast<PolygonVertexItem *>(castEdge->getEndVertex());
+        PolygonVertexItem *startVertex = reinterpret_cast<PolygonVertexItem *>(castEdge->getStartVertex());
+        PolygonVertexItem *endVertex   = reinterpret_cast<PolygonVertexItem *>(castEdge->getEndVertex());
 
-        if (startVertex->getConstraint()) startVertex->getConstraint()->apply(startVertex);
-        if (endVertex->getConstraint()) endVertex->getConstraint()->apply(endVertex);
+        if (startVertex->getConstraint())
+            startVertex->getConstraint()->apply(startVertex);
+        if (endVertex->getConstraint())
+            endVertex->getConstraint()->apply(endVertex);
     }
 
     runApplyInternal(getNextEdge(edge, direction), stopEdge, direction);

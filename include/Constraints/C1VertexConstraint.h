@@ -7,7 +7,8 @@
 
 #include "BaseVertexConstraint.h"
 
-class C1VertexConstraint : public BaseVertexConstraint {
+class C1VertexConstraint : public BaseVertexConstraint
+{
     void apply(PolygonVertexItem *vertexItem) override;
     void apply(ControlVertexItem *controlVertexItem) override;
     void paintIcon(QPainter *painter, const QPointF &center, const PolygonVertexItem *) override;
@@ -20,5 +21,4 @@ class C1VertexConstraint : public BaseVertexConstraint {
     static QPointF calculateControlPointPosition(const QPointF &basePos, const QPointF &targetPos, double fraction);
 };
 
-
-#endif //POLYGONEDITOR_C1VERTEXCONSTRAINT_H
+#endif // POLYGONEDITOR_C1VERTEXCONSTRAINT_H

@@ -5,12 +5,12 @@
 #ifndef POLYGONEDITOR_POLYGONVERTEXITEM_H
 #define POLYGONEDITOR_POLYGONVERTEXITEM_H
 
+#include "Constraints/BaseVertexConstraint.h"
+#include "Vertex/BaseVertexItem.h"
 #include <QGraphicsItem>
 #include <QList>
 #include <QPainter>
 #include <gtest/gtest.h>
-#include "Vertex/BaseVertexItem.h"
-#include "Constraints/BaseVertexConstraint.h"
 
 class BaseEdgeItem;
 /*
@@ -35,7 +35,7 @@ class PolygonVertexItem : public BaseVertexItem
 
     private:
     void contextMenuEvent(QGraphicsSceneContextMenuEvent *event) override;
-    BaseVertexConstraint* constraint = nullptr;
+    BaseVertexConstraint *constraint = nullptr;
 
     friend QDataStream &operator<<(QDataStream &out, const PolygonVertexItem &vertex);
     friend class PolygonItem;

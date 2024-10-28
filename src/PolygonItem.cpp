@@ -4,9 +4,9 @@
 #include <iostream>
 
 #include "Constraints/ConstraintChecker.h"
+#include "Edge/BezierEdgeItem.h"
 #include "Edge/PolygonEdgeItem.h"
 #include "PolygonItem.h"
-#include "Edge/BezierEdgeItem.h"
 
 PolygonItem::PolygonItem() : selectedVertexIndex(-1) {}
 
@@ -17,7 +17,7 @@ void PolygonItem::createDefaultPolygon()
     appendVertex(QPointF(200, 200));
     appendVertex(QPointF(150, 300));
     appendVertex(QPointF(10, 200));
-    PolygonEdgeItem* casted_edge = reinterpret_cast<PolygonEdgeItem *>(edges[0]);
+    PolygonEdgeItem *casted_edge = reinterpret_cast<PolygonEdgeItem *>(edges[0]);
     casted_edge->addHorizontalConstraint();
     casted_edge = reinterpret_cast<PolygonEdgeItem *>(edges[1]);
     casted_edge->addVerticalConstraint();
@@ -25,7 +25,6 @@ void PolygonItem::createDefaultPolygon()
     casted_edge->addLengthConstraintNoWindow();
     casted_edge = reinterpret_cast<PolygonEdgeItem *>(edges[4]);
     casted_edge->makeBezier();
-
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -82,7 +81,7 @@ void PolygonItem::appendVertex(const QPointF &position)
     {
         // Create an edge from the previous vertex to this one
         BaseVertexItem *previousVertex = vertices[vertices.size() - 2];
-        PolygonEdgeItem *newEdge    = new PolygonEdgeItem(previousVertex, newVertex, this);
+        PolygonEdgeItem *newEdge       = new PolygonEdgeItem(previousVertex, newVertex, this);
         addEdge(newEdge);
     }
 
@@ -125,8 +124,18 @@ void PolygonItem::insertVertex(unsigned int index, const QPointF &position)
 
     vertices.insert(index + 1, newVertex);
     deleteEdge(prevVertex->edgeOut);
-    addEdge(new PolygonEdgeItem(reinterpret_cast<PolygonVertexItem*>(prevVertex),reinterpret_cast<PolygonVertexItem*>(newVertex), this), index);
-    addEdge(new PolygonEdgeItem(reinterpret_cast<PolygonVertexItem*>(newVertex), reinterpret_cast<PolygonVertexItem*>(nextVertex), this), index + 1);
+    addEdge(
+        new PolygonEdgeItem(
+            reinterpret_cast<PolygonVertexItem *>(prevVertex), reinterpret_cast<PolygonVertexItem *>(newVertex), this
+        ),
+        index
+    );
+    addEdge(
+        new PolygonEdgeItem(
+            reinterpret_cast<PolygonVertexItem *>(newVertex), reinterpret_cast<PolygonVertexItem *>(nextVertex), this
+        ),
+        index + 1
+    );
 
     prepareGeometryChange();
     Q_ASSERT(checkLinearOrdering());
@@ -459,23 +468,26 @@ void PolygonItem::applyConstraints(BaseEdgeItem *edge)
     ConstraintChecker::runApply(edge, edge->getEndVertex()->edgeOut, SearchDirection::Backward);
 }
 
-void PolygonItem::changeEdgeToBezier(PolygonEdgeItem *edgeItemNormal) {
+void PolygonItem::changeEdgeToBezier(PolygonEdgeItem *edgeItemNormal)
+{
     Q_ASSERT(edgeItemNormal != nullptr);
     Q_ASSERT(edges.contains(edgeItemNormal));
 
     int edgeIndex = edges.indexOf(edgeItemNormal);
-    BezierEdgeItem *bezierEdge = new BezierEdgeItem(edgeItemNormal->getStartVertex(), edgeItemNormal->getEndVertex(), this);
+    BezierEdgeItem *bezierEdge =
+        new BezierEdgeItem(edgeItemNormal->getStartVertex(), edgeItemNormal->getEndVertex(), this);
     deleteEdge(edgeItemNormal);
     addEdge(bezierEdge, edgeIndex);
 }
 
-void PolygonItem::changeEdgeToNormal(BezierEdgeItem *edgeItemBezier) {
+void PolygonItem::changeEdgeToNormal(BezierEdgeItem *edgeItemBezier)
+{
     Q_ASSERT(edgeItemBezier != nullptr);
     Q_ASSERT(edges.contains(edgeItemBezier));
 
     int edgeIndex = edges.indexOf(edgeItemBezier);
-    PolygonEdgeItem *normalEdge = new PolygonEdgeItem(edgeItemBezier->getStartVertex(), edgeItemBezier->getEndVertex(), this);
+    PolygonEdgeItem *normalEdge =
+        new PolygonEdgeItem(edgeItemBezier->getStartVertex(), edgeItemBezier->getEndVertex(), this);
     deleteEdge(edgeItemBezier);
     addEdge(normalEdge, edgeIndex);
-
 }
