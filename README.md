@@ -1,6 +1,6 @@
 # Polygon Editor with Constraints
 
-This repository contains a Qt-based polygon editor application that allows users to interactively create, edit, and constrain polygons. The system leverages a hierarchical object structure to represent and manipulate polygon vertices, edges, and their associated constraints. It is designed to be both extensible and illustrative of various computer graphics and computational geometry concepts.
+This repository contains a Qt-based polygon editor application that allows users to interactively create, edit, and constrain polygons. The system leverages a hierarchical object structure to represent and manipulate polygon vertices, edges, and their associated constraints.
 
 ## Key Features
 
